@@ -587,21 +587,43 @@ void XmaContext::Decode(XMA_CONTEXT_DATA* data) {
 
     auto ret = avcodec_send_packet(av_context_, av_packet_);
     if (ret < 0) {
-      XELOGE("XmaContext {}: Error sending packet for decoding", id());
-      // TODO bail out
-      assert_always();
+      XELOGW("XmaContext {}: Error sending packet for decoding (error code: {})", id(), ret);
+      XELOGW("  Continuing with silence output to prevent crash");
+      // Output silence instead of crashing
+      auto byte_count = kBytesPerFrameChannel << data->is_stereo;
+      if (output_remaining_bytes >= byte_count) {
+        std::vector<uint8_t> silence(byte_count, 0);
+        output_rb.Write(silence.data(), byte_count);
+        output_remaining_bytes -= byte_count;
+      }
+      continue;  // Skip this frame and continue
     }
+
     ret = avcodec_receive_frame(av_context_, av_frame_);
-    /*
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-      // TODO AVERROR_EOF???
+
+    // Handle normal cases where decoder needs more data or reached end
+    if (ret == AVERROR(EAGAIN)) {
+      // Decoder needs more input - this is normal
+      XELOGD("XmaContext {}: Decoder needs more input (EAGAIN)", id());
       break;
-    else
-    */
+    }
+    if (ret == AVERROR_EOF) {
+      // End of stream reached - this is normal
+      XELOGD("XmaContext {}: End of stream reached (EOF)", id());
+      break;
+    }
+
     if (ret < 0) {
-      XELOGE("XmaContext {}: Error during decoding", id());
-      assert_always();
-      return;  // TODO bail out
+      XELOGW("XmaContext {}: Error during decoding (error code: {})", id(), ret);
+      XELOGW("  Outputting silence to prevent crash - game audio may be degraded");
+      // Output silence instead of crashing
+      auto byte_count = kBytesPerFrameChannel << data->is_stereo;
+      if (output_remaining_bytes >= byte_count) {
+        std::vector<uint8_t> silence(byte_count, 0);
+        output_rb.Write(silence.data(), byte_count);
+        output_remaining_bytes -= byte_count;
+      }
+      return;  // Skip this decode attempt but don't crash
     }
     assert_true(ret == 0);
 
@@ -705,13 +727,16 @@ size_t XmaContext::GetNextFrame(uint8_t* block, size_t size,
 
   uint64_t len = stream.Read(15);
   if ((len - 15) > stream.BitsRemaining()) {
-    assert_always("TODO");
+    XELOGW(
+        "XMA: Frame length ({}) exceeds available bits ({}), skipping frame",
+        len - 15, stream.BitsRemaining());
     // *bit_offset = next_packet;
     // return false;
     // return next_packet;
     return 0;
   } else if (len >= xma::kMaxFrameLength) {
-    assert_always("TODO");
+    XELOGW("XMA: Frame length ({}) exceeds maximum ({}), skipping frame", len,
+           xma::kMaxFrameLength);
     // *bit_offset = next_packet;
     // return false;
     return 0;

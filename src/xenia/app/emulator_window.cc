@@ -870,7 +870,12 @@ void EmulatorWindow::ShowContentDirectory() {
   }
 
   if (!std::filesystem::exists(target_path)) {
-    std::filesystem::create_directories(target_path);
+    std::error_code ec;
+    std::filesystem::create_directories(target_path, ec);
+    // Continue even if create fails - directory might exist now (race condition)
+    if (ec && !std::filesystem::exists(target_path)) {
+      XELOGW("Failed to create content directory: {}", ec.message());
+    }
   }
 
   LaunchFileExplorer(target_path);

@@ -1,0 +1,32 @@
+# Xenia Configuration for Maximum Stability
+# Place this file as 'portable.txt' in the same directory as xenia.exe
+
+# Logging - Enable to debug crashes
+log_file = xenia.log
+log_level = 2
+
+# CPU - Reduce crashes from CPU emulation
+cpu_unsafe_optimizations = false
+cpu_disasm = false
+
+# Memory - More lenient memory handling
+protect_zero = false
+protect_on_release = false
+scribble_heap = false
+
+# GPU - Reduce GPU-related crashes
+gpu = d3d12
+gpu_allow_invalid_fetch_constants = true
+
+# Audio - Prevent audio crashes
+apu = xaudio2
+
+# General Stability
+ignore_thread_affinities = true
+ignore_thread_priorities = true
+
+# vsync can prevent some timing-related crashes
+vsync = true
+
+# Disable features that can cause crashes
+discord = false

@@ -135,7 +135,10 @@ dword_result_t NtQueryInformationFile_entry(
     }
     default: {
       // Unsupported, for now.
-      assert_always();
+      XELOGE(
+          "NtQueryInformationFile: Unsupported info_class {}, returning "
+          "X_STATUS_INVALID_PARAMETER",
+          info_class);
       status = X_STATUS_INVALID_PARAMETER;
       out_length = 0;
       break;
@@ -246,7 +249,11 @@ dword_result_t NtSetInformationFile_entry(
     }
     default:
       // Unsupported, for now.
-      assert_always();
+      XELOGE(
+          "NtSetInformationFile: Unsupported info_class {}, returning "
+          "X_STATUS_INVALID_PARAMETER",
+          info_class);
+      result = X_STATUS_INVALID_PARAMETER;
       out_length = 0;
       break;
   }
@@ -317,7 +324,12 @@ dword_result_t NtQueryVolumeInformationFile_entry(
       info->sectors_per_allocation_unit = device->sectors_per_allocation_unit();
       info->bytes_per_sector = device->bytes_per_sector();
       // TODO(gibbed): sanity check, XCTD userland code seems to require this.
-      assert_true(info->bytes_per_sector == 0x200);
+      if (info->bytes_per_sector != 0x200) {
+        XELOGW(
+            "NtQueryVolumeInformationFile: bytes_per_sector ({}) != 0x200, "
+            "XCTD code may not work correctly",
+            info->bytes_per_sector);
+      }
       out_length = sizeof(*info);
       break;
     }
@@ -341,7 +353,11 @@ dword_result_t NtQueryVolumeInformationFile_entry(
     case XFileFsDeviceInformation:
     default: {
       // Unsupported, for now.
-      assert_always();
+      XELOGE(
+          "NtQueryVolumeInformationFile: Unsupported info_class {}, returning "
+          "X_STATUS_INVALID_PARAMETER",
+          info_class);
+      status = X_STATUS_INVALID_PARAMETER;
       out_length = 0;
       break;
     }

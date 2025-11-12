@@ -78,7 +78,10 @@ std::unique_ptr<Entry> HostPathEntry::CreateEntryInternal(
   auto full_path = host_path_ / xe::to_path(name);
   if (attributes & kFileAttributeDirectory) {
     if (!std::filesystem::create_directories(full_path)) {
-      return nullptr;
+      // Check if directory exists (race condition)
+      if (!std::filesystem::exists(full_path)) {
+        return nullptr;
+      }
     }
   } else {
     auto file = xe::filesystem::OpenFile(full_path, "wb");

@@ -18,14 +18,17 @@
 #include "xenia/base/assert.h"
 #include "xenia/base/byte_stream.h"
 #include "xenia/base/clock.h"
+#include "xenia/base/crash_recovery.h"
 #include "xenia/base/cvar.h"
 #include "xenia/base/debugging.h"
 #include "xenia/base/exception_handler.h"
+#include "xenia/base/game_compatibility.h"
 #include "xenia/base/literals.h"
 #include "xenia/base/logging.h"
 #include "xenia/base/mapped_memory.h"
 #include "xenia/base/platform.h"
 #include "xenia/base/string.h"
+#include "xenia/base/threading.h"
 #include "xenia/cpu/backend/code_cache.h"
 #include "xenia/cpu/backend/null_backend.h"
 #include "xenia/cpu/cpu_flags.h"
@@ -255,6 +258,9 @@ X_STATUS Emulator::Setup(
   LOAD_KERNEL_MODULE(xbdm::XbdmModule);
 #undef LOAD_KERNEL_MODULE
 
+  // Initialize game compatibility database
+  game_compatibility::GameCompatibilityDatabase::GetInstance().Initialize();
+
   // Initialize emulator fallback exception handling last.
   ExceptionHandler::Install(Emulator::ExceptionCallbackThunk, this);
 
@@ -266,7 +272,14 @@ X_STATUS Emulator::TerminateTitle() {
     return X_STATUS_UNSUCCESSFUL;
   }
 
-  kernel_state_->TerminateTitle();
+  // Only terminate if kernel state is fully initialized
+  // If kernel_state_ is null, the title is still loading and can't be safely terminated
+  if (kernel_state_) {
+    kernel_state_->TerminateTitle();
+  } else {
+    XELOGW("TerminateTitle called but kernel_state_ not initialized - skipping thread termination");
+  }
+
   title_id_ = std::nullopt;
   title_name_ = "";
   title_version_ = "";
@@ -275,18 +288,49 @@ X_STATUS Emulator::TerminateTitle() {
 }
 
 X_STATUS Emulator::LaunchPath(const std::filesystem::path& path) {
+  XELOGI("=== LaunchPath: Attempting to launch '{}'", xe::path_to_utf8(path));
+
+  // If a title is already running, terminate it and clean up
+  if (is_title_open()) {
+    XELOGI("LaunchPath: Title already open, terminating current title");
+    TerminateTitle();
+
+    // Wait for thread termination to complete (threads have 2s timeout each)
+    // Give extra time to ensure all cleanup is finished
+    XELOGI("LaunchPath: Waiting for thread termination to complete...");
+    xe::threading::Sleep(std::chrono::seconds(3));
+
+    // Unregister game devices and symlinks
+    file_system_->UnregisterSymbolicLink("game:");
+    file_system_->UnregisterSymbolicLink("d:");
+    file_system_->UnregisterDevice("\\Device\\Cdrom0");
+    file_system_->UnregisterDevice("\\Device\\Harddisk0\\Partition1");
+
+    // Recreate kernel state for clean slate
+    kernel_state_.reset();
+    kernel_state_ = std::make_unique<xe::kernel::KernelState>(this);
+    XELOGI("LaunchPath: Kernel state recreated");
+
+    XELOGI("LaunchPath: Cleanup complete, ready for new title");
+  }
+
   // Launch based on file type.
   // This is a silly guess based on file extension.
   if (!path.has_extension()) {
     // Likely an STFS container.
+    XELOGI("LaunchPath: Detected STFS container (no extension)");
     return LaunchStfsContainer(path);
   };
   auto extension = xe::utf8::lower_ascii(xe::path_to_utf8(path.extension()));
+  XELOGI("LaunchPath: File extension: '{}'", extension);
+
   if (extension == ".xex" || extension == ".elf" || extension == ".exe") {
     // Treat as a naked xex file.
+    XELOGI("LaunchPath: Launching as XEX file");
     return LaunchXexFile(path);
   } else {
     // Assume a disc image.
+    XELOGI("LaunchPath: Launching as disc image");
     return LaunchDiscImage(path);
   }
 }
@@ -615,8 +659,8 @@ bool Emulator::ExceptionCallback(Exception* ex) {
   // Now suspend ourself (we should be a guest thread).
   current_thread->Suspend(nullptr);
 
-  // We should not arrive here!
-  assert_always();
+  // We should not arrive here, but if thread suspension failed, log and exit gracefully
+  XELOGE("Thread suspension failed after guest crash - terminating thread");
   return false;
 }
 
@@ -820,6 +864,26 @@ X_STATUS Emulator::CompleteLaunch(const std::filesystem::path& path,
       if (icon_block) {
         display_window_->SetIcon(icon_block.buffer, icon_block.size);
       }
+    }
+  }
+
+  // Apply game-specific compatibility fixes if available
+  if (title_id_.has_value() && title_id_.value() != 0) {
+    auto& compat_db = game_compatibility::GameCompatibilityDatabase::GetInstance();
+    if (compat_db.HasGameInfo(title_id_.value())) {
+      auto game_info = compat_db.GetGameInfo(title_id_.value());
+      XELOGI("========================================");
+      XELOGI("GAME COMPATIBILITY INFO");
+      XELOGI("  Title: {}", game_info.title_name);
+      XELOGI("  Status: {}", static_cast<int>(game_info.status));
+      XELOGI("  Known Issues: {}", game_info.known_issues.size());
+      XELOGI("  Available Fixes: {}", game_info.fixes.size());
+      XELOGI("========================================");
+
+      // Apply all known fixes for this game
+      compat_db.ApplyFixes(title_id_.value());
+    } else {
+      XELOGI("No compatibility data for title {:08X}", title_id_.value());
     }
   }
 

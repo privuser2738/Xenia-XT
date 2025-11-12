@@ -623,11 +623,11 @@ uint32_t FromPageAccess(xe::memory::PageAccess protect) {
       return kMemoryProtectRead | kMemoryProtectWrite;
     case memory::PageAccess::kExecuteReadOnly:
       // Guest memory cannot be executable - this should never happen :)
-      assert_always();
+      XELOGW("Unexpected kExecuteReadOnly page access for guest memory");
       return kMemoryProtectRead;
     case memory::PageAccess::kExecuteReadWrite:
       // Guest memory cannot be executable - this should never happen :)
-      assert_always();
+      XELOGW("Unexpected kExecuteReadWrite page access for guest memory");
       return kMemoryProtectRead | kMemoryProtectWrite;
   }
 
@@ -841,7 +841,12 @@ bool BaseHeap::AllocFixed(uint32_t base_address, uint32_t size,
                           uint32_t protect) {
   alignment = xe::round_up(alignment, page_size_);
   size = xe::align(size, alignment);
-  assert_true(base_address % alignment == 0);
+  if (base_address % alignment != 0) {
+    XELOGE(
+        "BaseHeap::AllocFixed: base_address 0x{:08X} is not aligned to 0x{:X}",
+        base_address, alignment);
+    return false;
+  }
   uint32_t page_count = get_page_count(size, page_size_);
   uint32_t start_page_number = (base_address - heap_base_) / page_size_;
   uint32_t end_page_number = start_page_number + page_count - 1;
@@ -932,7 +937,19 @@ bool BaseHeap::AllocRange(uint32_t low_address, uint32_t high_address,
       std::min(uint32_t(page_table_.size()) - 1, high_page_number);
 
   if (page_count > (high_page_number - low_page_number)) {
-    XELOGE("BaseHeap::Alloc page count too big for requested range");
+    // Rate limit this error to prevent log spam with truncated/corrupted ISOs
+    static std::atomic<uint64_t> last_log_time{0};
+    uint64_t now = xe::Clock::QueryHostUptimeMillis();
+    uint64_t last = last_log_time.load();
+    if (now - last > 1000) {  // Log once per second max
+      if (last_log_time.compare_exchange_strong(last, now)) {
+        XELOGE(
+            "BaseHeap::Alloc page count too big for requested range (size=0x{:X}, "
+            "page_count={}, available={}-{}={})",
+            size, page_count, high_page_number, low_page_number,
+            high_page_number - low_page_number);
+      }
+    }
     return false;
   }
 
@@ -1020,8 +1037,7 @@ bool BaseHeap::AllocRange(uint32_t low_address, uint32_t high_address,
   }
   if (start_page_number == UINT_MAX || end_page_number == UINT_MAX) {
     // Out of memory.
-    XELOGE("BaseHeap::Alloc failed to find contiguous range");
-    assert_always("Heap exhausted!");
+    XELOGE("BaseHeap::Alloc failed to find contiguous range - heap exhausted");
     return false;
   }
 
@@ -1416,11 +1432,17 @@ bool PhysicalHeap::Alloc(uint32_t size, uint32_t alignment,
   // Given the address we've reserved in the parent heap, pin that here.
   // Shouldn't be possible for it to be allocated already.
   uint32_t address = heap_base_ + parent_address - parent_heap_start;
-  if (!BaseHeap::AllocFixed(address, size, alignment, allocation_type,
+
+  // The address is already determined by parent allocation and offset calculation.
+  // When heap_base_ >= 0xE0000000, GetPhysicalAddress adds 0x1000 offset, which
+  // may not align with requested alignment. We must pin at the calculated address
+  // using our heap's base page_size_, not the requested alignment.
+  if (!BaseHeap::AllocFixed(address, size, page_size_, allocation_type,
                             protect)) {
     XELOGE(
-        "PhysicalHeap::Alloc unable to pin physical memory in physical heap");
-    // TODO(benvanik): don't leak parent memory.
+        "PhysicalHeap::Alloc unable to pin physical memory in physical heap - freeing parent allocation");
+    // Free the parent memory to avoid leak
+    parent_heap_->Release(parent_address, nullptr);
     return false;
   }
   *out_address = address;

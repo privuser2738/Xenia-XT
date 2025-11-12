@@ -426,7 +426,12 @@ void Shader::GatherVertexFetchInformation(
     }
   }
   if (!attrib) {
-    assert_not_zero(fetch_instr.attributes.stride);
+    // Some games use zero stride for constant vertex attributes
+    if (fetch_instr.attributes.stride == 0) {
+      XELOGW("Vertex fetch with zero stride for fetch constant {}, skipping binding creation",
+             op.fetch_constant_index());
+      return;
+    }
     VertexBinding vertex_binding;
     vertex_binding.binding_index = int(vertex_bindings_.size());
     vertex_binding.fetch_constant = op.fetch_constant_index();

@@ -1,0 +1,69 @@
+Building Debug...
+
+Found Visual Studio msbuild at: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
+Set VCTargetsPath=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\
+- building...
+
+  aes_128.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\aes_128.lib
+  fmt.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\fmt.lib
+  imgui.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\imgui.lib
+  capstone.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\capstone.lib
+  dxbc.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\dxbc.lib
+  discord-rpc.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\discord-rpc.lib
+  glslang-spirv.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\glslang-spirv.lib
+  snappy.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\snappy.lib
+  xenia-app-discord.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-app-discord.lib
+  xxhash.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xxhash.lib
+  libavutil.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\libavutil.lib
+  crash_recovery.cc
+  SDL2.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\SDL2.lib
+  libavcodec.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\libavcodec.lib
+  xenia-helper-sdl.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-helper-sdl.lib
+  xenia-base.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-base.lib
+  xenia-hid.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid.lib
+  mspack.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\mspack.lib
+  xenia-vfs.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-vfs.lib
+  xenia-hid-xinput.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid-xinput.lib
+  xenia-core.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-core.lib
+  xenia-ui.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-ui.lib
+  xenia-hid-nop.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid-nop.lib
+  xenia-hid-winkey.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid-winkey.lib
+  xenia-ui-d3d12.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-ui-d3d12.lib
+  xenia-cpu.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-cpu.lib
+  xenia-hid-sdl.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid-sdl.lib
+  xenia-ui-vulkan.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-ui-vulkan.lib
+  xenia-debug-ui.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-debug-ui.lib
+  trace_writer.cc
+  xenia-vfs-dump.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-vfs-dump.exe
+  xenia-vfs-tests.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-vfs-tests.exe
+  xenia-base-tests.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-base-tests.exe
+  xenia-apu.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-apu.lib
+  xenia-apu-sdl.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-apu-sdl.lib
+  xenia-apu-xaudio2.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-apu-xaudio2.lib
+  xenia-ui-window-d3d12-demo.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-ui-window-d3d12-demo.exe
+  xboxkrnl_memory.cc
+  xenia-apu-nop.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-apu-nop.lib
+  xenia-ui-window-vulkan-demo.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-ui-window-vulkan-demo.exe
+  xenia-cpu-backend-x64.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-cpu-backend-x64.lib
+  xenia-gpu.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu.lib
+  xenia-gpu-null.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-null.lib
+  xenia-gpu-vulkan.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-vulkan.lib
+  xenia-gpu-d3d12.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-d3d12.lib
+  xenia-hid-demo.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-hid-demo.exe
+  xenia-gpu-shader-compiler.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-shader-compiler.exe
+  xenia-cpu-ppc-tests.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-cpu-ppc-tests.exe
+  xenia-kernel.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-kernel.lib
+  emulator_window.cc
+     Creating library bin\Windows\Debug\xenia-gpu-d3d12-trace-viewer.lib and object bin\Windows\Debug\xenia-gpu-d3d12-trace-viewer.exp
+     Creating library bin\Windows\Debug\xenia-gpu-vulkan-trace-viewer.lib and object bin\Windows\Debug\xenia-gpu-vulkan-trace-viewer.exp
+     Creating library bin\Windows\Debug\xenia-gpu-d3d12-trace-dump.lib and object bin\Windows\Debug\xenia-gpu-d3d12-trace-dump.exp
+     Creating library bin\Windows\Debug\xenia-gpu-vulkan-trace-dump.lib and object bin\Windows\Debug\xenia-gpu-vulkan-trace-dump.exp
+  xenia-cpu-tests.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-cpu-tests.exe
+  xenia-gpu-d3d12-trace-viewer.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-d3d12-trace-viewer.exe
+  xenia-gpu-d3d12-trace-dump.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-d3d12-trace-dump.exe
+  xenia-gpu-vulkan-trace-dump.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-vulkan-trace-dump.exe
+     Creating library bin\Windows\Debug\xenia.lib and object bin\Windows\Debug\xenia.exp
+  xenia-gpu-vulkan-trace-viewer.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia-gpu-vulkan-trace-viewer.exe
+  xenia-app.vcxproj -> c:\Users\rob\komod\xenia\build\bin\Windows\Debug\xenia.exe
+
+Success

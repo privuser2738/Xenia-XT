@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <queue>
+#include <unordered_set>
 #include <vector>
 
 #include "xenia/base/logging.h"
@@ -532,8 +533,20 @@ StfsContainerDevice::Error StfsContainerDevice::ReadSTFS() {
 
   auto& descriptor = header_.metadata.volume_descriptor.stfs;
   uint32_t table_block_index = descriptor.file_table_block_number();
+  // Security: Track visited table blocks to detect cycles
+  std::unordered_set<uint32_t> visited_table_blocks;
   size_t n = 0;
   for (n = 0; n < descriptor.file_table_block_count; n++) {
+    // Security: Check for circular table block chain
+    if (visited_table_blocks.count(table_block_index)) {
+      XELOGE(
+          "STFS: Circular table block chain detected at block {}, possible "
+          "corrupted or malicious file",
+          table_block_index);
+      return Error::kErrorDamagedFile;
+    }
+    visited_table_blocks.insert(table_block_index);
+
     auto offset = BlockToOffsetSTFS(table_block_index);
     xe::filesystem::Seek(file, offset, SEEK_SET);
 
@@ -554,6 +567,14 @@ StfsContainerDevice::Error StfsContainerDevice::ReadSTFS() {
       if (dir_entry.directory_index == 0xFFFF) {
         parent_entry = root_entry;
       } else {
+        // Security: Validate directory_index is within bounds
+        if (dir_entry.directory_index >= all_entries.size()) {
+          XELOGE(
+              "STFS: Invalid directory_index {} (max: {}), possible corrupted "
+              "or malicious file",
+              dir_entry.directory_index, all_entries.size());
+          return Error::kErrorDamagedFile;
+        }
         parent_entry = all_entries[dir_entry.directory_index];
       }
 
@@ -587,13 +608,33 @@ StfsContainerDevice::Error StfsContainerDevice::ReadSTFS() {
       if (entry->attributes() & X_FILE_ATTRIBUTE_NORMAL) {
         uint32_t block_index = dir_entry.start_block_number();
         size_t remaining_size = dir_entry.length;
+        // Security: Track visited blocks to detect cycles
+        std::unordered_set<uint32_t> visited_blocks;
         while (remaining_size && block_index != kEndOfChain) {
+          // Security: Check for circular block chain
+          if (visited_blocks.count(block_index)) {
+            XELOGE(
+                "STFS: Circular block chain detected at block {}, possible "
+                "corrupted or malicious file",
+                block_index);
+            return Error::kErrorDamagedFile;
+          }
+          visited_blocks.insert(block_index);
+
           size_t block_size =
               std::min(static_cast<size_t>(kBlockSize), remaining_size);
           size_t offset = BlockToOffsetSTFS(block_index);
           entry->block_list_.push_back({0, offset, block_size});
           remaining_size -= block_size;
           auto block_hash = GetBlockHash(block_index);
+          // Security: Check for null pointer from GetBlockHash
+          if (!block_hash) {
+            XELOGE(
+                "STFS: GetBlockHash failed for block {}, possible corrupted or "
+                "malicious file",
+                block_index);
+            return Error::kErrorDamagedFile;
+          }
           block_index = block_hash->level0_next_block();
         }
 
@@ -623,6 +664,14 @@ StfsContainerDevice::Error StfsContainerDevice::ReadSTFS() {
     }
 
     auto block_hash = GetBlockHash(table_block_index);
+    // Security: Check for null pointer from GetBlockHash
+    if (!block_hash) {
+      XELOGE(
+          "STFS: GetBlockHash failed for table block {}, possible corrupted or "
+          "malicious file",
+          table_block_index);
+      return Error::kErrorDamagedFile;
+    }
     table_block_index = block_hash->level0_next_block();
     if (table_block_index == kEndOfChain) {
       break;

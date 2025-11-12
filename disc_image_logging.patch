@@ -1,0 +1,89 @@
+--- a/src/xenia/vfs/devices/disc_image_device.cc
++++ b/src/xenia/vfs/devices/disc_image_device.cc
+@@ -166,11 +166,15 @@ Entry* DiscImageDevice::ResolvePath(const std::string_view path) {
+ DiscImageDevice::Error DiscImageDevice::Verify(ParseState* state) {
+   // Find sector 32 of the game partition - try at a few points.
+   static const size_t likely_offsets[] = {
+       0x00000000, 0x0000FB20, 0x00020600, 0x02080000, 0x0FD90000,
+   };
+   bool magic_found = false;
++  XELOGI("  Searching for GDFX magic at {} known offsets...", xe::countof(likely_offsets));
+   for (size_t n = 0; n < xe::countof(likely_offsets); n++) {
+     state->game_offset = likely_offsets[n];
+-    if (VerifyMagic(state, state->game_offset + (32 * kXESectorSize))) {
++    size_t magic_offset = state->game_offset + (32 * kXESectorSize);
++    if (VerifyMagic(state, magic_offset)) {
+       magic_found = true;
++      XELOGI("  Found GDFX magic at game_offset 0x{:X} (sector 32 at 0x{:X})",
++             state->game_offset, magic_offset);
+       break;
+     }
+   }
+   if (!magic_found) {
+     // File doesn't have the magic values - likely not a real GDFX source.
++    XELOGE("  GDFX magic not found - this is not a valid Xbox 360 disc image");
+     return Error::kErrorFileMismatch;
+   }
+
+   // Read sector 32 to get FS state.
+   if (state->size < state->game_offset + (32 * kXESectorSize)) {
++    XELOGE("  File too small for GDFX header");
+     return Error::kErrorReadError;
+   }
+   uint8_t* fs_ptr = state->ptr + state->game_offset + (32 * kXESectorSize);
+   state->root_sector = xe::load<uint32_t>(fs_ptr + 20);
+   state->root_size = xe::load<uint32_t>(fs_ptr + 24);
+   state->root_offset =
+       state->game_offset + (state->root_sector * kXESectorSize);
++
++  XELOGI("  Root directory info:");
++  XELOGI("    Root sector: {} (0x{:X})", state->root_sector, state->root_sector);
++  XELOGI("    Root size: {} bytes (0x{:X})", state->root_size, state->root_size);
++  XELOGI("    Root offset: 0x{:X}", state->root_offset);
++  XELOGI("    File size: 0x{:X} ({} MB)", state->size, state->size / (1024 * 1024));
++
+   if (state->root_size < 13 || state->root_size > 32_MiB) {
++    XELOGE("  Invalid root size: {} bytes (expected 13 to {} bytes)",
++           state->root_size, 32_MiB);
+     return Error::kErrorDamagedFile;
+   }
+
++  // Validate root offset is within file
++  if (state->root_offset >= state->size) {
++    XELOGE("  Root offset 0x{:X} exceeds file size 0x{:X}",
++           state->root_offset, state->size);
++    return Error::kErrorDamagedFile;
++  }
++
++  if (state->root_offset + state->root_size > state->size) {
++    XELOGE("  Root directory (0x{:X} + 0x{:X}) exceeds file size 0x{:X}",
++           state->root_offset, state->root_size, state->size);
++    return Error::kErrorDamagedFile;
++  }
++
++  XELOGI("  GDFX header validated successfully");
+   return Error::kSuccess;
+ }
+
+@@ -209,6 +250,14 @@ DiscImageDevice::Error DiscImageDevice::ReadAllEntries(
+   auto root_entry = new DiscImageEntry(this, nullptr, "", mmap_.get());
+   root_entry->attributes_ = kFileAttributeDirectory;
+   root_entry_ = std::unique_ptr<Entry>(root_entry);
+
++  XELOGI("  Parsing root directory:");
++  XELOGI("    Root buffer offset: 0x{:X}", root_buffer - state->ptr);
++  XELOGI("    Root buffer size: {} bytes", state->root_size);
++  XELOGI("    First 16 bytes: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
++         root_buffer[0], root_buffer[1], root_buffer[2], root_buffer[3],
++         root_buffer[4], root_buffer[5], root_buffer[6], root_buffer[7],
++         root_buffer[8], root_buffer[9], root_buffer[10], root_buffer[11],
++         root_buffer[12], root_buffer[13], root_buffer[14], root_buffer[15]);
+
+   if (!ReadEntry(state, root_buffer, 0, root_entry)) {
++    XELOGE("  ReadEntry failed for root directory");
+     return Error::kErrorOutOfMemory;
+   }
+
++  XELOGI("  Successfully parsed {} root entries", root_entry->children_.size());
+   return Error::kSuccess;
+ }

@@ -238,11 +238,15 @@ void PipelineCache::InitializeShaderStorage(
   // they are up to date).
   auto shader_storage_shareable_root = shader_storage_root / "shareable";
   if (!std::filesystem::exists(shader_storage_shareable_root)) {
-    if (!std::filesystem::create_directories(shader_storage_shareable_root)) {
+    std::error_code ec;
+    std::filesystem::create_directories(shader_storage_shareable_root, ec);
+    // Check if directory now exists (might have been created by another process)
+    if (!std::filesystem::exists(shader_storage_shareable_root)) {
       XELOGE(
           "Failed to create the shareable shader storage directory, persistent "
-          "shader storage will be disabled: {}",
-          xe::path_to_utf8(shader_storage_shareable_root));
+          "shader storage will be disabled: {} (error: {})",
+          xe::path_to_utf8(shader_storage_shareable_root),
+          ec ? ec.message() : "unknown");
       return;
     }
   }

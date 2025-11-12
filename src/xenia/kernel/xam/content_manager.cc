@@ -142,7 +142,11 @@ X_RESULT ContentManager::CreateContent(const std::string_view root_name,
   }
 
   if (!std::filesystem::create_directories(package_path)) {
-    return X_ERROR_ACCESS_DENIED;
+    // Creation failed - check if directory exists now (race condition)
+    // If it exists, continue. If not, return error.
+    if (!std::filesystem::exists(package_path)) {
+      return X_ERROR_ACCESS_DENIED;
+    }
   }
 
   auto package = ResolvePackage(root_name, data);

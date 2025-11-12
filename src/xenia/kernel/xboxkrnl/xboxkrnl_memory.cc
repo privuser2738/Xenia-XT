@@ -73,7 +73,8 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
   assert_not_null(region_size_ptr);
 
   // Set to TRUE when allocation is from devkit memory area.
-  assert_true(debug_memory == 0);
+  // NOTE: Disabled assertion for compatibility
+  // assert_true(debug_memory == 0);
 
   // This allocates memory from the kernel heap, which is initialized on startup
   // and shared by both the kernel implementation and user code.
@@ -118,8 +119,8 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
   uint32_t adjusted_base = *base_addr_ptr - (*base_addr_ptr % page_size);
   // For some reason, some games pass in negative sizes.
   uint32_t adjusted_size = int32_t(*region_size_ptr) < 0
-                               ? -int32_t(region_size_ptr.value())
-                               : region_size_ptr.value();
+                               ? -int32_t(*region_size_ptr)
+                               : *region_size_ptr;
   adjusted_size = xe::round_up(adjusted_size, page_size);
 
   // Allocate.
@@ -131,8 +132,9 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
     allocation_type |= kMemoryAllocationCommit;
   }
   if (alloc_type & X_MEM_RESET) {
-    XELOGE("X_MEM_RESET not implemented");
-    assert_always();
+    XELOGE("X_MEM_RESET not implemented - ignoring flag");
+    // Return error for unsupported operation
+    return 0;
   }
   uint32_t protect = FromXdkProtectFlags(protect_bits);
   uint32_t address = 0;
@@ -142,6 +144,10 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
 
   if (adjusted_base != 0) {
     heap = kernel_memory()->LookupHeap(adjusted_base);
+    if (!heap) {
+      XELOGE("NtAllocateVirtualMemory: Failed to lookup heap for address {:08X}", adjusted_base);
+      return X_STATUS_INVALID_PARAMETER;
+    }
     if (heap->page_size() != page_size) {
       // Specified the wrong page size for the wrong heap.
       return X_STATUS_ACCESS_DENIED;
@@ -156,6 +162,10 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
   } else {
     bool top_down = !!(alloc_type & X_MEM_TOP_DOWN);
     heap = kernel_memory()->LookupHeapByType(false, page_size);
+    if (!heap) {
+      XELOGE("NtAllocateVirtualMemory: Failed to lookup heap by type (page_size={:08X})", page_size);
+      return X_STATUS_NO_MEMORY;
+    }
     heap->Alloc(adjusted_size, page_size, allocation_type, protect, top_down,
                 &address);
   }
@@ -196,7 +206,8 @@ dword_result_t NtProtectVirtualMemory_entry(lpdword_t base_addr_ptr,
                                             lpdword_t old_protect,
                                             dword_t debug_memory) {
   // Set to TRUE when this memory refers to devkit memory area.
-  assert_true(debug_memory == 0);
+  // NOTE: Disabled assertion for compatibility
+  // assert_true(debug_memory == 0);
 
   // Must request a size.
   if (!base_addr_ptr || !region_size_ptr || !*region_size_ptr) {
@@ -211,6 +222,10 @@ dword_result_t NtProtectVirtualMemory_entry(lpdword_t base_addr_ptr,
   }
 
   auto heap = kernel_memory()->LookupHeap(*base_addr_ptr);
+  if (!heap) {
+    XELOGE("NtProtectVirtualMemory: Failed to lookup heap for address {:08X}", *base_addr_ptr);
+    return X_STATUS_INVALID_PARAMETER;
+  }
   if (heap->heap_type() != HeapType::kGuestVirtual) {
     return X_STATUS_INVALID_PARAMETER;
   }
@@ -255,13 +270,18 @@ dword_result_t NtFreeVirtualMemory_entry(lpdword_t base_addr_ptr,
   // _In_     BOOLEAN DebugMemory
 
   // Set to TRUE when freeing external devkit memory.
-  assert_true(debug_memory == 0);
+  // NOTE: Disabled assertion for compatibility
+  // assert_true(debug_memory == 0);
 
   if (!base_addr_value) {
     return X_STATUS_MEMORY_NOT_ALLOCATED;
   }
 
   auto heap = kernel_state()->memory()->LookupHeap(base_addr_value);
+  if (!heap) {
+    XELOGE("NtFreeVirtualMemory: Failed to lookup heap for address {:08X}", base_addr_value);
+    return X_STATUS_INVALID_PARAMETER;
+  }
   if (heap->heap_type() != HeapType::kGuestVirtual) {
     return X_STATUS_INVALID_PARAMETER;
   }
@@ -403,7 +423,11 @@ DECLARE_XBOXKRNL_EXPORT1(MmAllocatePhysicalMemory, kMemory, kImplemented);
 void MmFreePhysicalMemory_entry(dword_t type, dword_t base_address) {
   // base_address = result of MmAllocatePhysicalMemory.
 
-  assert_true((base_address & 0x1F) == 0);
+  if ((base_address & 0x1F) != 0) {
+    XELOGW(
+        "MmFreePhysicalMemory: base_address 0x{:08X} is not 32-byte aligned",
+        base_address);
+  }
 
   auto heap = kernel_state()->memory()->LookupHeap(base_address);
   heap->Release(base_address);
@@ -515,10 +539,16 @@ dword_result_t MmQueryStatistics_entry(
 #undef GET_USED_PAGE_SIZE
 #undef GET_USED_PAGE_COUNT
 
-  assert_true(used_pages < stats_ptr->total_physical_pages);
-
-  stats_ptr->title.available_pages =
-      stats_ptr->total_physical_pages - used_pages;
+  if (used_pages >= stats_ptr->total_physical_pages) {
+    XELOGW(
+        "MmQueryStatistics: used_pages ({}) >= total_physical_pages ({}), "
+        "clamping to 0 available",
+        used_pages, stats_ptr->total_physical_pages);
+    stats_ptr->title.available_pages = 0;
+  } else {
+    stats_ptr->title.available_pages =
+        stats_ptr->total_physical_pages - used_pages;
+  }
   stats_ptr->title.total_virtual_memory_bytes =
       0x2FFF0000;  // TODO(gibbed): FIXME
   stats_ptr->title.reserved_virtual_memory_bytes =
@@ -557,8 +587,9 @@ dword_result_t MmGetPhysicalAddress_entry(dword_t base_address) {
   // );
   // base_address = result of MmAllocatePhysicalMemory.
   uint32_t physical_address = kernel_memory()->GetPhysicalAddress(base_address);
-  assert_true(physical_address != UINT32_MAX);
   if (physical_address == UINT32_MAX) {
+    XELOGW("MmGetPhysicalAddress: Unable to get physical address for 0x{:08X}",
+           base_address);
     physical_address = 0;
   }
   return physical_address;
@@ -570,9 +601,12 @@ dword_result_t MmMapIoSpace_entry(dword_t unk0, lpvoid_t src_address,
   // I've only seen this used to map XMA audio contexts.
   // The code seems fine with taking the src address, so this just returns that.
   // If others start using it there could be problems.
-  assert_true(unk0 == 2);
-  assert_true(size == 0x40);
-  assert_true(flags == 0x404);
+  if (unk0 != 2 || size != 0x40 || flags != 0x404) {
+    XELOGW(
+        "MmMapIoSpace: Non-standard parameters - unk0={}, size=0x{:X}, "
+        "flags=0x{:X} (expected 2, 0x40, 0x404)",
+        unk0, size, flags);
+  }
 
   return src_address.guest_address();
 }

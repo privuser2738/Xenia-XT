@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-01-01T00:00:00Z",
+  "games": [
+    {
+      "title_id": "4D5307E6",
+      "title_name": "Halo 3",
+      "region": "US",
+      "status": "playable",
+      "tested_version": "1.0",
+      "known_issues": [
+        "graphics_corruption",
+        "shader_issues"
+      ],
+      "fixes": [
+        {
+          "type": "graphics_settings",
+          "description": "Fix graphics flickering on Ampere GPUs",
+          "enabled": true,
+          "priority": 10,
+          "config": {
+            "disable_render_cache": true,
+            "use_safe_shader_cache": true
+          }
+        }
+      ],
+      "notes": "Works well on most systems. May have flickering on newer NVIDIA GPUs.",
+      "tested_by": "community",
+      "test_date": "2025-01-01"
+    }
+  ],
+  "compatibility_status": {
+    "unknown": 0,
+    "broken": 1,
+    "loads": 2,
+    "gameplay": 3,
+    "playable": 4,
+    "perfect": 5
+  },
+  "issue_types": {
+    "graphics_corruption": 0,
+    "audio_glitches": 1,
+    "memory_leak": 2,
+    "frequent_crashes": 3,
+    "slow_performance": 4,
+    "input_issues": 5,
+    "save_game_issues": 6,
+    "networking_broken": 7,
+    "cutscene_issues": 8,
+    "physics_glitches": 9,
+    "texture_issues": 10,
+    "shader_issues": 11
+  },
+  "fix_types": {
+    "memory_configuration": 0,
+    "graphics_settings": 1,
+    "cpu_workaround": 2,
+    "timing_adjustment": 3,
+    "blacklist_address": 4,
+    "patch_code": 5,
+    "skip_function": 6,
+    "force_settings": 7
+  }
+}

@@ -27,6 +27,10 @@ bool IsDebuggerAttached();
 // If no debugger is present, a signal will be raised.
 void Break();
 
+// Custom assertion handler with copy/paste dialog.
+// Returns: 0 = Abort, 1 = Retry (break), 2 = Ignore
+int ShowAssertionDialog(const char* message, const char* file, int line);
+
 namespace internal {
 void DebugPrint(const char* s);
 }

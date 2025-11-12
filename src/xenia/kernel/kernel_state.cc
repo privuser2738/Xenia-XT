@@ -9,6 +9,8 @@
 
 #include "xenia/kernel/kernel_state.h"
 
+#include <chrono>
+#include <future>
 #include <string>
 
 #include "third_party/fmt/include/fmt/format.h"
@@ -518,7 +520,23 @@ void KernelState::TerminateTitle() {
         }
 
         global_lock.unlock();
-        processor_->StepToGuestSafePoint(thread->thread_id());
+        // Try to step to safe point with a timeout to prevent hanging
+        // Use a future with timeout to avoid infinite waits
+        auto step_future = std::async(std::launch::async, [this, thread]() {
+          try {
+            processor_->StepToGuestSafePoint(thread->thread_id());
+            return true;
+          } catch (...) {
+            return false;
+          }
+        });
+
+        // Wait up to 2 seconds for thread to reach safe point
+        if (step_future.wait_for(std::chrono::seconds(2)) == std::future_status::timeout) {
+          XELOGW("Thread {} failed to reach safe point after 2s timeout, forcing termination",
+                 thread->thread_id());
+        }
+
         thread->Terminate(0);
         global_lock.lock();
       }
@@ -533,7 +551,10 @@ void KernelState::TerminateTitle() {
   // Third: Unload all user modules (including the executable).
   for (size_t i = 0; i < user_modules_.size(); i++) {
     X_STATUS status = user_modules_[i]->Unload();
-    assert_true(XSUCCEEDED(status));
+    if (!XSUCCEEDED(status)) {
+      XELOGW("Failed to unload module {}: status 0x{:08X}",
+             user_modules_[i]->name(), status);
+    }
 
     object_table_.RemoveHandle(user_modules_[i]->handle());
   }

@@ -18,6 +18,7 @@
 #include "xenia/app/discord/discord_presence.h"
 #include "xenia/app/emulator_window.h"
 #include "xenia/base/assert.h"
+#include "xenia/base/crash_recovery.h"
 #include "xenia/base/cvar.h"
 #include "xenia/base/debugging.h"
 #include "xenia/base/logging.h"
@@ -411,6 +412,14 @@ bool EmulatorApp::OnInitialize() {
   Profiler::Initialize();
   Profiler::ThreadEnter("Main");
 
+  // Initialize crash recovery system first
+  auto& crash_recovery = xe::crash_recovery::CrashRecoveryManager::GetInstance();
+  std::string crash_db_path = xe::path_to_utf8(
+      xe::filesystem::GetExecutableFolder() / "crash_recovery.db");
+  crash_recovery.Initialize(crash_db_path);
+  crash_recovery.InstallCrashHandlers();
+  XELOGI("Crash recovery system initialized");
+
   // Figure out where internal files and content should go.
   std::filesystem::path storage_root = cvars::storage_root;
   if (storage_root.empty()) {
@@ -492,6 +501,9 @@ void EmulatorApp::OnDestroy() {
   if (cvars::discord) {
     discord::DiscordPresence::Shutdown();
   }
+
+  // Shutdown crash recovery before profiler
+  xe::crash_recovery::CrashRecoveryManager::GetInstance().Shutdown();
 
   Profiler::Dump();
   // The profiler needs to shut down before the graphics context.

@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_set>
 
 #include "xenia/base/mapped_memory.h"
 #include "xenia/vfs/device.h"
@@ -70,7 +71,9 @@ class DiscImageDevice : public Device {
   bool VerifyMagic(ParseState* state, size_t offset);
   Error ReadAllEntries(ParseState* state, const uint8_t* root_buffer);
   bool ReadEntry(ParseState* state, const uint8_t* buffer,
-                 uint16_t entry_ordinal, DiscImageEntry* parent);
+                 uint16_t entry_ordinal, DiscImageEntry* parent,
+                 size_t buffer_size = 0, int depth = 0,
+                 std::unordered_set<uint16_t>* visited = nullptr);
 };
 
 }  // namespace vfs

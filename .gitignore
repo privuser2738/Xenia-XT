@@ -72,6 +72,9 @@ private/
 imgui.ini
 *.log
 
+# Windows special device names that might be created accidentally
+nul
+
 # ==============================================================================
 # Build system output
 # ==============================================================================
@@ -101,3 +104,65 @@ node_modules/.bin/
 /third_party/binutils/binutils*
 /third_party/vasm/
 /tools/shader-playground/*.dll
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps 
+/dist 
+/bin 
+/build 
+/deps
+/dist
+/bin
+/build
+.
+build/

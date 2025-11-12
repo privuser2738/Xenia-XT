@@ -11,8 +11,16 @@
 #define XENIA_BASE_ASSERT_H_
 
 #include <assert.h>
+#include <stdlib.h>
 
 #include "xenia/base/platform.h"
+
+namespace xe {
+namespace debugging {
+int ShowAssertionDialog(const char* message, const char* file, int line);
+void Break();
+}  // namespace debugging
+}  // namespace xe
 
 namespace xe {
 
@@ -20,8 +28,25 @@ namespace xe {
   static_assert(sizeof(type) == size,  \
                 "bad definition for " #type ": must be " #size " bytes")
 
-// We rely on assert being compiled out in NDEBUG.
-#define xenia_assert assert
+// Custom assertion macro with better UI
+#if defined(NDEBUG)
+// In release builds, assertions are removed
+#define xenia_assert(expr) ((void)0)
+#else
+// In debug builds, use custom dialog
+#define xenia_assert(expr)                                                   \
+  do {                                                                       \
+    if (!(expr)) {                                                           \
+      int __assert_result =                                                  \
+          xe::debugging::ShowAssertionDialog(#expr, __FILE__, __LINE__);     \
+      if (__assert_result == 0) {                                            \
+        abort();                                                             \
+      } else if (__assert_result == 1) {                                     \
+        xe::debugging::Break();                                              \
+      }                                                                      \
+    }                                                                        \
+  } while (0)
+#endif
 
 #define __XENIA_EXPAND(x) x
 #define __XENIA_ARGC(...)                                                     \
