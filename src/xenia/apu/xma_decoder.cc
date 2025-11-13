@@ -347,6 +347,13 @@ void XmaDecoder::WriteRegister(uint32_t addr, uint32_t value) {
     // 0601h (1804h) is written to with 0x02000000 and 0x03000000 around a lock
     // operation
     switch (r) {
+      case 0x0601: {
+        // Lock/synchronization register
+        // Games write 0x02000000 (lock) and 0x03000000 (unlock) to this register
+        // We don't need to track locks in the emulator, so just acknowledge the write
+        XELOGD("XMA: Lock register write: {:08X}", value);
+        break;
+      }
       default: {
         const auto register_info = register_file_.GetRegisterInfo(r);
         if (register_info) {
