@@ -82,7 +82,9 @@
       "Bash(else echo \"File does not exist\")",
       "Bash(then stat -c \"%y\" \"build/bin/Windows/Release/xenia.exe\")",
       "Bash(else echo \"Build not found\")",
-      "Bash(./build/bin/Windows/Release/xenia.exe:*)"
+      "Bash(./build/bin/Windows/Release/xenia.exe:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
