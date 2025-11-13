@@ -628,6 +628,47 @@ dword_result_t RtlComputeCrc32_entry(dword_t seed, lpvoid_t buffer,
 }
 DECLARE_XBOXKRNL_EXPORT1(RtlComputeCrc32, kNone, kImplemented);
 
+void RtlCaptureContext_entry(lpvoid_t context_ptr) {
+  // RtlCaptureContext captures the current CPU state (registers, PC, etc.)
+  // This is critical for exception handling and SEH (Structured Exception Handling)
+  // For Tekken 6 and other games that use exception handlers
+  //
+  // For now, we stub this as proper context capturing requires deep integration
+  // with the CPU emulation layer. Games using this typically have exception
+  // handlers that may not be triggered in emulation anyway.
+
+  XELOGD("RtlCaptureContext({:08X}) - stubbed", context_ptr.guest_address());
+
+  // In a full implementation, this would:
+  // 1. Get current thread context (all registers)
+  // 2. Store GPRs, FPRs, VRs, special registers (LR, CTR, CR, XER, MSR, PC)
+  // 3. Write them to the CONTEXT structure at context_ptr
+  // For emulation, we acknowledge the call without full implementation
+}
+DECLARE_XBOXKRNL_EXPORT1(RtlCaptureContext, kThreading, kStub);
+
+void RtlUnwind_entry(lpvoid_t target_frame, lpvoid_t target_ip,
+                     lpvoid_t exception_record, lpvoid_t return_value) {
+  // RtlUnwind performs stack unwinding for exception handling
+  // It's used by C++ exception handling and SEH
+  // For now, we stub this as games using it will handle exceptions differently
+
+  XELOGD(
+      "RtlUnwind(target_frame={:08X}, target_ip={:08X}, "
+      "exception_record={:08X}, return_value={:08X}) - stubbed",
+      target_frame.guest_address(), target_ip.guest_address(),
+      exception_record.guest_address(), return_value.guest_address());
+
+  // In a full implementation, this would:
+  // 1. Walk the stack frames
+  // 2. Call exception handlers/finally blocks
+  // 3. Restore stack to target_frame
+  // 4. Jump to target_ip
+
+  // For emulation purposes, we let the natural flow continue
+}
+DECLARE_XBOXKRNL_EXPORT1(RtlUnwind, kThreading, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

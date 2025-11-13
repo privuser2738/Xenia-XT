@@ -38,6 +38,17 @@ DECLARE_XAM_EXPORT1(XamVoiceClose, kNone, kStub);
 dword_result_t XamVoiceHeadsetPresent_entry(lpunknown_t voice_ptr) { return 0; }
 DECLARE_XAM_EXPORT1(XamVoiceHeadsetPresent, kNone, kStub);
 
+dword_result_t XamVoiceSetMicArrayIdleUsers_entry(dword_t user_mask) {
+  // XamVoiceSetMicArrayIdleUsers configures which users are idle for the
+  // Kinect microphone array. This is used in games with voice chat or
+  // Kinect support to manage which users should be monitored by the mic array.
+  // For emulation, we stub this as success since we don't have real Kinect
+  // hardware or voice chat functionality.
+  XELOGD("XamVoiceSetMicArrayIdleUsers({:08X}) - stubbed", user_mask);
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamVoiceSetMicArrayIdleUsers, kNone, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

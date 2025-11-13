@@ -686,6 +686,28 @@ dword_result_t XeKeysHmacShaUsingKey_entry(lpvoid_t obscured_key,
 }
 DECLARE_XBOXKRNL_EXPORT1(XeKeysHmacShaUsingKey, kNone, kImplemented);
 
+dword_result_t XeKeysConsolePrivateKeySign_entry(lpvoid_t input,
+                                                  dword_t input_size,
+                                                  lpvoid_t output,
+                                                  lpvoid_t signature) {
+  // Called by Tekken 6 and other games for console-specific signing operations.
+  // This function signs data using the console's private key.
+  // For emulation purposes, we return success without actual signing since
+  // we're not performing real cryptographic operations on a real Xbox 360 hardware.
+  XELOGD(
+      "XeKeysConsolePrivateKeySign({:08X}, {:X}, {:08X}, {:08X}) - stubbed",
+      input.guest_address(), input_size, output.guest_address(),
+      signature.guest_address());
+
+  // Zero out the signature buffer (typical size is 256 bytes)
+  if (signature) {
+    std::memset(signature, 0, 256);
+  }
+
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(XeKeysConsolePrivateKeySign, kNone, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

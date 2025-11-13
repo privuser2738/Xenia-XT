@@ -1212,16 +1212,16 @@ uint32_t Processor::StepToGuestSafePoint(uint32_t thread_id, bool ignore_host) {
       }
     } else {
       // We've managed to catch a thread before it called into the guest.
-      // Set a breakpoint on its startup procedure and capture it there.
-      // TODO(DrChat): Reimplement
-      assert_always("Unimplemented");
-      /*
-      auto creation_params = thread->creation_params();
-      pc = creation_params->xapi_thread_startup
-               ? creation_params->xapi_thread_startup
-               : creation_params->start_address;
-      StepToGuestAddress(thread_id, pc);
-      */
+      // This can happen during game termination when threads are being cleaned up.
+      // Since the thread hasn't entered guest code yet, there's no safe point to
+      // step to. Return 0 to indicate we couldn't find a safe point.
+      // TODO(DrChat): Set a breakpoint on the thread's startup procedure and
+      // capture it there if/when creation_params become available.
+      XELOGW(
+          "StepToGuestSafePoint: Thread {:08X} hasn't entered guest code yet, "
+          "cannot find safe point",
+          thread_id);
+      return 0;
     }
   }
 

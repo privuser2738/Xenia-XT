@@ -321,8 +321,14 @@ void XamLoaderTerminateTitle_entry() {
 }
 DECLARE_XAM_EXPORT1(XamLoaderTerminateTitle, kNone, kSketchy);
 
-dword_result_t XamAlloc_entry(dword_t unk, dword_t size, lpdword_t out_ptr) {
-  assert_true(unk == 0);
+dword_result_t XamAlloc_entry(dword_t flags, dword_t size, lpdword_t out_ptr) {
+  // First parameter appears to be flags. Most games pass 0, but some games
+  // (during save file operations) pass non-zero values. The meaning is unknown.
+  // Log non-zero values for investigation but continue with allocation.
+  if (flags != 0) {
+    XELOGW("XamAlloc called with non-zero flags: 0x{:08X}, size: 0x{:X}",
+           uint32_t(flags), uint32_t(size));
+  }
 
   // Allocate from the heap. Not sure why XAM does this specially, perhaps
   // it keeps stuff in a separate heap?

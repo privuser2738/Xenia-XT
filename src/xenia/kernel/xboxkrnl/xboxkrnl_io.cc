@@ -734,6 +734,28 @@ dword_result_t IoCreateDevice_entry(dword_t device_struct, dword_t r4,
 }
 DECLARE_XBOXKRNL_EXPORT1(IoCreateDevice, kFileSystem, kStub);
 
+dword_result_t IoDismountVolume_entry(dword_t device_object) {
+  // Called during disc change/swap operations. This function dismounts a volume
+  // given a device object pointer. For ISO swapping, games call this before
+  // attempting to mount a new disc image.
+  // We stub this out as success since our virtual filesystem doesn't require
+  // explicit dismounting and remounting.
+  XELOGD("IoDismountVolume({:08X}) - stubbed", device_object);
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoDismountVolume, kFileSystem, kStub);
+
+dword_result_t IoDismountVolumeByFileHandle_entry(dword_t file_handle) {
+  // Called by Tekken 6 and potentially other games during cleanup/dismount
+  // operations. This function is supposed to dismount a volume given a file
+  // handle to a file or directory on that volume.
+  // For now, we stub this out as a success since our virtual filesystem
+  // doesn't require explicit dismounting.
+  XELOGD("IoDismountVolumeByFileHandle({:08X}) - stubbed", file_handle);
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoDismountVolumeByFileHandle, kFileSystem, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

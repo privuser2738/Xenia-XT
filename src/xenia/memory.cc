@@ -1472,9 +1472,13 @@ bool PhysicalHeap::AllocFixed(uint32_t base_address, uint32_t size,
 
   // Given the address we've reserved in the parent heap, pin that here.
   // Shouldn't be possible for it to be allocated already.
+  // The address is already determined by parent allocation and offset calculation.
+  // When heap_base_ >= 0xE0000000, GetPhysicalAddress adds 0x1000 offset, which
+  // may not align with requested alignment. We must pin at the calculated address
+  // using our heap's base page_size_, not the requested alignment.
   uint32_t address =
       heap_base_ + parent_base_address - GetPhysicalAddress(heap_base_);
-  if (!BaseHeap::AllocFixed(address, size, alignment, allocation_type,
+  if (!BaseHeap::AllocFixed(address, size, page_size_, allocation_type,
                             protect)) {
     XELOGE(
         "PhysicalHeap::Alloc unable to pin physical memory in physical heap");
@@ -1513,9 +1517,13 @@ bool PhysicalHeap::AllocRange(uint32_t low_address, uint32_t high_address,
 
   // Given the address we've reserved in the parent heap, pin that here.
   // Shouldn't be possible for it to be allocated already.
+  // The address is already determined by parent allocation and offset calculation.
+  // When heap_base_ >= 0xE0000000, GetPhysicalAddress adds 0x1000 offset, which
+  // may not align with requested alignment. We must pin at the calculated address
+  // using our heap's base page_size_, not the requested alignment.
   uint32_t address =
       heap_base_ + parent_address - GetPhysicalAddress(heap_base_);
-  if (!BaseHeap::AllocFixed(address, size, alignment, allocation_type,
+  if (!BaseHeap::AllocFixed(address, size, page_size_, allocation_type,
                             protect)) {
     XELOGE(
         "PhysicalHeap::Alloc unable to pin physical memory in physical heap");

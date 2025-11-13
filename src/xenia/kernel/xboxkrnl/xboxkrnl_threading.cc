@@ -1391,6 +1391,29 @@ pointer_result_t InterlockedFlushSList_entry(
 }
 DECLARE_XBOXKRNL_EXPORT1(InterlockedFlushSList, kThreading, kImplemented);
 
+dword_result_t KeSaveFloatingPointState_entry(lpvoid_t save_area_ptr) {
+  // KeSaveFloatingPointState saves the current floating point state (FPU/VPU
+  // registers) to a save area. This is used when a thread needs to preserve
+  // floating point state across context switches or critical sections.
+  // For emulation, the host manages floating point state automatically, so we
+  // stub this as success.
+  XELOGD("KeSaveFloatingPointState({:08X}) - stubbed",
+         save_area_ptr.guest_address());
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeSaveFloatingPointState, kThreading, kStub);
+
+dword_result_t KeRestoreFloatingPointState_entry(lpvoid_t save_area_ptr) {
+  // KeRestoreFloatingPointState restores floating point state from a save area
+  // previously saved by KeSaveFloatingPointState.
+  // For emulation, the host manages floating point state automatically, so we
+  // stub this as success.
+  XELOGD("KeRestoreFloatingPointState({:08X}) - stubbed",
+         save_area_ptr.guest_address());
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(KeRestoreFloatingPointState, kThreading, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

@@ -120,6 +120,21 @@ void VdGetCurrentDisplayInformation_entry(
   display_info->scaler_parameters.horizontal_filter_type = 1;
   display_info->scaler_parameters.vertical_filter_type = 1;
 
+  // Initialize filter parameters to prevent flickering/artifacts
+  // These values reduce interlacing artifacts from CRT displays and provide
+  // smooth filtering on modern displays. Values based on Xbox 360 SDK defaults.
+  // Horizontal filter parameters
+  display_info->scaler_parameters.horizontal_filter_parameters.nyquist = 0.5f;
+  display_info->scaler_parameters.horizontal_filter_parameters.flicker_filter =
+      0.0f;  // 0.0 = no flicker filtering for progressive scan
+  display_info->scaler_parameters.horizontal_filter_parameters.beta = 0.0f;
+
+  // Vertical filter parameters
+  display_info->scaler_parameters.vertical_filter_parameters.nyquist = 0.5f;
+  display_info->scaler_parameters.vertical_filter_parameters.flicker_filter =
+      0.0f;  // 0.0 = no flicker filtering for progressive scan
+  display_info->scaler_parameters.vertical_filter_parameters.beta = 0.0f;
+
   display_info->display_window_overscan_left = 320;
   display_info->display_window_overscan_top = 180;
   display_info->display_window_overscan_right = 320;

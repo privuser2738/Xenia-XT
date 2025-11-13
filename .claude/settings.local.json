@@ -59,7 +59,16 @@
       "Bash(mvc3_test_run2.log)",
       "Bash(mvc3_test_run3.log)",
       "Bash(del nul 2)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(lips_test.log)",
+      "Bash(lips_test_fixed.log)",
+      "Bash(lips_test_final.log)",
+      "Bash(timeout 30 ./build/bin/Windows/Release/xenia.exe:*)",
+      "Bash(lips_primary_monitor_test.log)",
+      "Bash(timeout:*)",
+      "Bash(./xb.cmd clean:*)",
+      "Bash(if [ -f \"mk_test.log\" ])",
+      "Bash(then tail -100 mk_test.log)"
     ],
     "deny": [],
     "ask": []

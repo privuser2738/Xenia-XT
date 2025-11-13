@@ -125,13 +125,30 @@ bool Win32Window::OpenImpl() {
                                                 dpi_, USER_DEFAULT_SCREEN_DPI));
   AdjustWindowRectangle(window_size_rect, window_style,
                         BOOL(main_menu != nullptr), window_ex_style, dpi_);
+  // Get the primary monitor to ensure the window opens on the correct display.
+  // Using CW_USEDEFAULT can place the window on external/disconnected monitors.
+  POINT primary_monitor_pos = {0, 0};
+  HMONITOR primary_monitor = MonitorFromPoint(primary_monitor_pos, MONITOR_DEFAULTTOPRIMARY);
+  MONITORINFO monitor_info = {};
+  monitor_info.cbSize = sizeof(MONITORINFO);
+  int window_x = CW_USEDEFAULT;
+  int window_y = CW_USEDEFAULT;
+  if (GetMonitorInfoW(primary_monitor, &monitor_info)) {
+    // Center the window on the primary monitor
+    int monitor_width = monitor_info.rcWork.right - monitor_info.rcWork.left;
+    int monitor_height = monitor_info.rcWork.bottom - monitor_info.rcWork.top;
+    int window_width = window_size_rect.right - window_size_rect.left;
+    int window_height = window_size_rect.bottom - window_size_rect.top;
+    window_x = monitor_info.rcWork.left + (monitor_width - window_width) / 2;
+    window_y = monitor_info.rcWork.top + (monitor_height - window_height) / 2;
+  }
   // Create the window. Though WM_NCCREATE will assign to `hwnd_` too, still do
   // the assignment here to handle the case of a failure after WM_NCCREATE, for
   // instance.
   hwnd_ = CreateWindowExW(
       window_ex_style, L"XeniaWindowClass",
       reinterpret_cast<LPCWSTR>(xe::to_utf16(GetTitle()).c_str()), window_style,
-      CW_USEDEFAULT, CW_USEDEFAULT,
+      window_x, window_y,
       window_size_rect.right - window_size_rect.left,
       window_size_rect.bottom - window_size_rect.top, nullptr, nullptr,
       hinstance, this);

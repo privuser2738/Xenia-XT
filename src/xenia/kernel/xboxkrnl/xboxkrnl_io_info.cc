@@ -99,14 +99,14 @@ dword_result_t NtQueryInformationFile_entry(
       break;
     }
     case XFileXctdCompressionInformation: {
-      XELOGE(
-          "NtQueryInformationFile(XFileXctdCompressionInformation) "
-          "unimplemented");
-      // Files that are XCTD compressed begin with the magic 0x0FF512ED but we
-      // shouldn't detect this that way. There's probably a flag somewhere
-      // (attributes?) that defines if it's compressed or not.
-      status = X_STATUS_INVALID_PARAMETER;
-      out_length = 0;
+      // Files that are XCTD compressed begin with the magic 0x0FF512ED.
+      // For now, we return "not compressed" for all files to avoid log spam
+      // and improve performance. Most games query this frequently.
+      // TODO(gibbed): detect actual XCTD compressed files by checking magic
+      // or file attributes.
+      auto info = info_ptr.as<X_FILE_XCTD_COMPRESSION_INFORMATION*>();
+      info->unknown = 0;  // 0 = not compressed
+      out_length = sizeof(*info);
       break;
     };
     case XFileNetworkOpenInformation: {

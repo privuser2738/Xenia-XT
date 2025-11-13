@@ -207,6 +207,36 @@ dword_result_t NtClose_entry(dword_t handle) {
 }
 DECLARE_XBOXKRNL_EXPORT1(NtClose, kNone, kImplemented);
 
+void ObReferenceObject_entry(dword_t object_ptr) {
+  // ObReferenceObject increments the reference count of a kernel object
+  // This is used for object lifetime management in the kernel
+  // For Tekken 6 and other games that need proper object management
+
+  // In Xenia, we use handles for most object management, so this is primarily
+  // a stub. The real object management happens through the object table.
+  // Games calling this expect it to succeed silently.
+
+  XELOGD("ObReferenceObject({:08X}) - stubbed", object_ptr);
+
+  // In a full implementation, this would:
+  // 1. Find the object in the object table
+  // 2. Increment its reference count
+  // For now, we just acknowledge the call
+}
+DECLARE_XBOXKRNL_EXPORT1(ObReferenceObject, kNone, kStub);
+
+dword_result_t ObIsTitleObject_entry(dword_t object_ptr) {
+  // ObIsTitleObject checks if an object belongs to the title (game) rather
+  // than the system. This is used for security/access control.
+  // For emulation, we'll return TRUE (1) to indicate objects are title-owned.
+
+  XELOGD("ObIsTitleObject({:08X}) - returning TRUE (title object)", object_ptr);
+
+  // Return 1 (TRUE) - assume all objects belong to the title
+  return 1;
+}
+DECLARE_XBOXKRNL_EXPORT1(ObIsTitleObject, kNone, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe
