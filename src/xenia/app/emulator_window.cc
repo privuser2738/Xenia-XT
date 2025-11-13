@@ -27,6 +27,7 @@
 #include "xenia/base/profiling.h"
 #include "xenia/base/system.h"
 #include "xenia/base/threading.h"
+#include "xenia/config.h"
 #include "xenia/cpu/processor.h"
 #include "xenia/emulator.h"
 #include "xenia/gpu/command_processor.h"
@@ -591,6 +592,21 @@ bool EmulatorWindow::Initialize() {
   }
   main_menu->AddChild(std::move(display_menu));
 
+  // Performance menu.
+  auto performance_menu = MenuItem::Create(MenuItem::Type::kPopup, "&Performance");
+  {
+    performance_menu->AddChild(MenuItem::Create(
+        MenuItem::Type::kString, "&Low (Maximum FPS)",
+        std::bind(&EmulatorWindow::PerformancePresetLow, this)));
+    performance_menu->AddChild(MenuItem::Create(
+        MenuItem::Type::kString, "&Medium (Balanced)",
+        std::bind(&EmulatorWindow::PerformancePresetMedium, this)));
+    performance_menu->AddChild(MenuItem::Create(
+        MenuItem::Type::kString, "&High (Quality)",
+        std::bind(&EmulatorWindow::PerformancePresetHigh, this)));
+  }
+  main_menu->AddChild(std::move(performance_menu));
+
   // Help menu.
   auto help_menu = MenuItem::Create(MenuItem::Type::kPopup, "&Help");
   {
@@ -839,6 +855,12 @@ void EmulatorWindow::FileOpen() {
   }
 
   if (!path.empty()) {
+    // Close any currently running title before launching a new one to prevent halt
+    if (emulator_->is_title_open()) {
+      XELOGI("Closing current title before loading new file...");
+      emulator_->TerminateTitle();
+    }
+
     // Normalize the path and make absolute.
     auto abs_path = std::filesystem::absolute(path);
     auto result = emulator_->LaunchPath(abs_path);
@@ -945,6 +967,33 @@ void EmulatorWindow::ToggleDisplayConfigDialog() {
   } else {
     display_config_dialog_.reset();
   }
+}
+
+void EmulatorWindow::PerformancePresetLow() {
+  // Low preset: Maximum performance
+  OVERRIDE_string(postprocess_antialiasing, "");
+  OVERRIDE_bool(postprocess_dither, false);
+  ApplyDisplayConfigForCvars();
+  config::SaveConfig();
+  XELOGI("Performance preset: Low (Maximum FPS) applied");
+}
+
+void EmulatorWindow::PerformancePresetMedium() {
+  // Medium preset: Balanced
+  OVERRIDE_string(postprocess_antialiasing, "fxaa");
+  OVERRIDE_bool(postprocess_dither, true);
+  ApplyDisplayConfigForCvars();
+  config::SaveConfig();
+  XELOGI("Performance preset: Medium (Balanced) applied");
+}
+
+void EmulatorWindow::PerformancePresetHigh() {
+  // High preset: Quality
+  OVERRIDE_string(postprocess_antialiasing, "fxaa_extreme");
+  OVERRIDE_bool(postprocess_dither, true);
+  ApplyDisplayConfigForCvars();
+  config::SaveConfig();
+  XELOGI("Performance preset: High (Quality) applied");
 }
 
 void EmulatorWindow::ShowCompatibility() {

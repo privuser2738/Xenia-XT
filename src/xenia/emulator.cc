@@ -113,6 +113,16 @@ Emulator::Emulator(const std::filesystem::path& command_line,
 Emulator::~Emulator() {
   // Note that we delete things in the reverse order they were initialized.
 
+  XELOGI("Emulator: Beginning shutdown sequence");
+
+  // Terminate any running title first to ensure clean shutdown
+  if (is_title_open()) {
+    XELOGI("Emulator: Terminating open title before shutdown");
+    TerminateTitle();
+    // Wait for any pending async operations to complete
+    xe::threading::Sleep(std::chrono::milliseconds(500));
+  }
+
   // Give the systems time to shutdown before we delete them.
   if (graphics_system_) {
     graphics_system_->Shutdown();
@@ -125,14 +135,19 @@ Emulator::~Emulator() {
   graphics_system_.reset();
   audio_system_.reset();
 
+  // Destroy kernel state - this will clean up all threads, timers, and callbacks
   kernel_state_.reset();
+
+  // Brief pause to allow OS-level cleanup of COM objects, timers, etc.
+  xe::threading::Sleep(std::chrono::milliseconds(100));
+
   file_system_.reset();
-
   processor_.reset();
-
   export_resolver_.reset();
 
   ExceptionHandler::Uninstall(Emulator::ExceptionCallbackThunk, this);
+
+  XELOGI("Emulator: Shutdown complete");
 }
 
 X_STATUS Emulator::Setup(
@@ -272,10 +287,17 @@ X_STATUS Emulator::TerminateTitle() {
     return X_STATUS_UNSUCCESSFUL;
   }
 
+  XELOGI("TerminateTitle: Beginning title termination");
+
   // Only terminate if kernel state is fully initialized
   // If kernel_state_ is null, the title is still loading and can't be safely terminated
   if (kernel_state_) {
     kernel_state_->TerminateTitle();
+
+    // Important: Wait for all pending async operations to complete or timeout
+    // This prevents delayed callbacks from executing after the title is terminated
+    XELOGI("TerminateTitle: Waiting for async operations to complete...");
+    xe::threading::Sleep(std::chrono::milliseconds(500));
   } else {
     XELOGW("TerminateTitle called but kernel_state_ not initialized - skipping thread termination");
   }
@@ -283,6 +305,8 @@ X_STATUS Emulator::TerminateTitle() {
   title_id_ = std::nullopt;
   title_name_ = "";
   title_version_ = "";
+
+  XELOGI("TerminateTitle: Title terminated successfully");
   on_terminate();
   return X_STATUS_SUCCESS;
 }
@@ -296,8 +320,9 @@ X_STATUS Emulator::LaunchPath(const std::filesystem::path& path) {
     TerminateTitle();
 
     // Wait for thread termination to complete (threads have 2s timeout each)
-    // Give extra time to ensure all cleanup is finished
-    XELOGI("LaunchPath: Waiting for thread termination to complete...");
+    // Give extra time to ensure all cleanup is finished and prevent carry-over
+    // of delayed operations/callbacks
+    XELOGI("LaunchPath: Waiting for thread termination and async cleanup...");
     xe::threading::Sleep(std::chrono::seconds(3));
 
     // Unregister game devices and symlinks
@@ -306,10 +331,17 @@ X_STATUS Emulator::LaunchPath(const std::filesystem::path& path) {
     file_system_->UnregisterDevice("\\Device\\Cdrom0");
     file_system_->UnregisterDevice("\\Device\\Harddisk0\\Partition1");
 
-    // Recreate kernel state for clean slate
+    // Forcefully destroy the kernel state to ensure all resources are freed
+    // This includes any pending timers, async operations, or COM callbacks
+    XELOGI("LaunchPath: Destroying kernel state to free all resources...");
     kernel_state_.reset();
+
+    // Additional sleep to allow OS-level cleanup (COM, timers, etc.)
+    xe::threading::Sleep(std::chrono::milliseconds(500));
+
+    // Recreate kernel state for clean slate
     kernel_state_ = std::make_unique<xe::kernel::KernelState>(this);
-    XELOGI("LaunchPath: Kernel state recreated");
+    XELOGI("LaunchPath: Kernel state recreated with fresh state");
 
     XELOGI("LaunchPath: Cleanup complete, ready for new title");
   }

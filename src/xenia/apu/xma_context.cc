@@ -458,8 +458,21 @@ void XmaContext::Decode(XMA_CONTEXT_DATA* data) {
       }
 
       if (frame_count > 0) {
-        assert_true(xma::GetPacketFrameOffset(packet) - 32 ==
-                    split_frame_len_ - split_frame_len_partial_);
+        auto expected_offset = split_frame_len_ - split_frame_len_partial_;
+        auto actual_offset = xma::GetPacketFrameOffset(packet) - 32;
+
+        if (actual_offset != expected_offset) {
+          // Some games (e.g., Injustice) have slight mismatches in split frame offsets
+          // Log warning but attempt to continue decoding
+          XELOGW("XmaContext {}: Split frame offset mismatch - expected: {}, actual: {} (diff: {})",
+                 id(), expected_offset, actual_offset,
+                 static_cast<int>(actual_offset) - static_cast<int>(expected_offset));
+
+          // Try to use the actual offset from the packet if it seems reasonable
+          if (actual_offset > 0 && actual_offset <= xma::kMaxFrameLength) {
+            split_frame_len_ = split_frame_len_partial_ + actual_offset;
+          }
+        }
       }
 
       auto offset = stream.Copy(

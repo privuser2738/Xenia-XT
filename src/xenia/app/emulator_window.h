@@ -139,6 +139,9 @@ class EmulatorWindow {
   void GpuTraceFrame();
   void GpuClearCaches();
   void ToggleDisplayConfigDialog();
+  void PerformancePresetLow();
+  void PerformancePresetMedium();
+  void PerformancePresetHigh();
   void ShowCompatibility();
   void ShowFAQ();
   void ShowBuildCommit();
