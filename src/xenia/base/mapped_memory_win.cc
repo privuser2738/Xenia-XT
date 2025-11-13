@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "third_party/fmt/include/fmt/format.h"
+#include "xenia/base/filesystem.h"
 #include "xenia/base/logging.h"
 #include "xenia/base/mapped_memory.h"
 #include "xenia/base/math.h"
@@ -138,6 +139,10 @@ std::unique_ptr<MappedMemory> MappedMemory::Open(
   mm->file_handle = CreateFile(path.c_str(), file_access, file_share, nullptr,
                                create_mode, FILE_ATTRIBUTE_NORMAL, nullptr);
   if (mm->file_handle == Win32MappedMemory::kFileHandleInvalid) {
+    DWORD error = GetLastError();
+    XELOGE(
+        "MappedMemory: CreateFile failed for '{}' - Error code: {} (0x{:08X})",
+        path_to_utf8(path), error, error);
     return nullptr;
   }
 
@@ -151,6 +156,11 @@ std::unique_ptr<MappedMemory> MappedMemory::Open(
                                ULONG64(aligned_length), nullptr);
 #endif
   if (mm->mapping_handle == Win32MappedMemory::kMappingHandleInvalid) {
+    DWORD error = GetLastError();
+    XELOGE(
+        "MappedMemory: CreateFileMapping failed for '{}' (size: {} bytes) - "
+        "Error code: {} (0x{:08X})",
+        path_to_utf8(path), aligned_length, error, error);
     return nullptr;
   }
 
@@ -164,6 +174,11 @@ std::unique_ptr<MappedMemory> MappedMemory::Open(
                            ULONG64(aligned_offset), aligned_length));
 #endif
   if (!mm->data_) {
+    DWORD error = GetLastError();
+    XELOGE(
+        "MappedMemory: MapViewOfFile failed for '{}' (offset: {}, length: {} "
+        "bytes) - Error code: {} (0x{:08X})",
+        path_to_utf8(path), aligned_offset, aligned_length, error, error);
     return nullptr;
   }
 

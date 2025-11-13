@@ -68,7 +68,21 @@
       "Bash(timeout:*)",
       "Bash(./xb.cmd clean:*)",
       "Bash(if [ -f \"mk_test.log\" ])",
-      "Bash(then tail -100 mk_test.log)"
+      "Bash(then tail -100 mk_test.log)",
+      "Bash(if [ -f \"rayman_fixed_test.log\" ])",
+      "Bash(then tail -50 rayman_fixed_test.log)",
+      "Bash(then wc -l rayman_fixed_test.log)",
+      "Bash(else echo \"0 rayman_fixed_test.log\")",
+      "Bash(xargs:*)",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(find:*)",
+      "Bash(if [ -f \"c:/Games/Soulcalibur IV (USA, Europe) (En,Ja,Fr,De,Es,It).iso\" ])",
+      "Bash(then stat -c \"%s bytes - %n\" \"c:/Games/Soulcalibur IV (USA, Europe) (En,Ja,Fr,De,Es,It).iso\")",
+      "Bash(else echo \"File does not exist\")",
+      "Bash(then stat -c \"%y\" \"build/bin/Windows/Release/xenia.exe\")",
+      "Bash(else echo \"Build not found\")",
+      "Bash(./build/bin/Windows/Release/xenia.exe:*)"
     ],
     "deny": [],
     "ask": []

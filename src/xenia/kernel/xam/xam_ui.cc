@@ -323,6 +323,36 @@ dword_result_t XamShowMessageBoxUI_entry(
 }
 DECLARE_XAM_EXPORT1(XamShowMessageBoxUI, kUI, kImplemented);
 
+// Extended version of XamShowMessageBoxUI with timeout support
+// https://www.se7ensins.com/forums/threads/working-xshowmessageboxui.844116/
+dword_result_t XamShowMessageBoxUIEx_entry(
+    dword_t user_index, lpu16string_t title_ptr, lpu16string_t text_ptr,
+    dword_t button_count, lpdword_t button_ptrs, dword_t active_button,
+    dword_t flags, dword_t timeout_ms, lpdword_t result_ptr,
+    pointer_t<XAM_OVERLAPPED> overlapped) {
+  // XamShowMessageBoxUIEx is the extended version with timeout support
+  // For simplicity, we ignore the timeout parameter and delegate to the
+  // standard XamShowMessageBoxUI implementation
+  //
+  // The timeout_ms parameter specifies how long (in milliseconds) to display
+  // the message box before auto-dismissing it. 0 means no timeout.
+
+  XELOGD(
+      "XamShowMessageBoxUIEx(user={}, title={:08X}, text={:08X}, "
+      "button_count={}, buttons={:08X}, active={}, flags={:08X}, timeout={}ms, "
+      "result={:08X}, ovl={:08X})",
+      user_index, title_ptr.guest_address(), text_ptr.guest_address(),
+      button_count, button_ptrs.guest_address(), active_button, flags,
+      timeout_ms, result_ptr.guest_address(), overlapped.guest_address());
+
+  // Just call the standard version, ignoring timeout for now
+  // A full implementation would need to track the timeout and auto-dismiss
+  return XamShowMessageBoxUI_entry(user_index, title_ptr, text_ptr,
+                                    button_count, button_ptrs, active_button,
+                                    flags, result_ptr, overlapped);
+}
+DECLARE_XAM_EXPORT1(XamShowMessageBoxUIEx, kUI, kImplemented);
+
 class KeyboardInputDialog : public XamDialog {
  public:
   KeyboardInputDialog(xe::ui::ImGuiDrawer* imgui_drawer, std::string title,

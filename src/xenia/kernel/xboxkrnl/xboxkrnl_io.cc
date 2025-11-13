@@ -756,6 +756,151 @@ dword_result_t IoDismountVolumeByFileHandle_entry(dword_t file_handle) {
 }
 DECLARE_XBOXKRNL_EXPORT1(IoDismountVolumeByFileHandle, kFileSystem, kStub);
 
+dword_result_t StfsCreateDevice_entry(dword_t device_id, dword_t num_blocks,
+                                      dword_t bytes_per_block,
+                                      lpvoid_t device_object_out) {
+  // StfsCreateDevice creates a Secure Transacted File System device
+  // STFS is used for save games, downloadable content, etc.
+  // For emulation, we acknowledge the call without creating actual device
+
+  XELOGD(
+      "StfsCreateDevice(device_id={:08X}, num_blocks={}, bytes_per_block={}, "
+      "device_object_out={:08X}) - stubbed",
+      device_id, num_blocks, bytes_per_block, device_object_out.guest_address());
+
+  // Return success but don't create actual device
+  // Games using STFS will typically fall back to other storage methods
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(StfsCreateDevice, kFileSystem, kStub);
+
+dword_result_t StfsControlDevice_entry(dword_t device_object,
+                                       dword_t control_code,
+                                       lpvoid_t input_buffer,
+                                       dword_t input_buffer_length,
+                                       lpvoid_t output_buffer,
+                                       dword_t output_buffer_length,
+                                       lpdword_t bytes_returned_ptr) {
+  // StfsControlDevice sends control codes to STFS device
+  // Similar to DeviceIoControl on Windows
+  // Control codes manage filesystem operations like mounting, unmounting, etc.
+
+  XELOGD(
+      "StfsControlDevice(device={:08X}, control_code={:08X}, "
+      "input_buffer={:08X}, input_len={}, output_buffer={:08X}, "
+      "output_len={}, bytes_returned={:08X}) - stubbed",
+      device_object, control_code, input_buffer.guest_address(),
+      input_buffer_length, output_buffer.guest_address(), output_buffer_length,
+      bytes_returned_ptr.guest_address());
+
+  // Set bytes returned to 0 if pointer provided
+  if (bytes_returned_ptr) {
+    *bytes_returned_ptr = 0;
+  }
+
+  // Return success to allow game to continue
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(StfsControlDevice, kFileSystem, kStub);
+
+void IoSetShareAccess_entry(dword_t desired_access, dword_t share_access,
+                            lpvoid_t file_object,
+                            lpvoid_t share_access_out) {
+  // IoSetShareAccess sets the share access information for a file object
+  // This is used when opening a file to track what kind of sharing is allowed
+  // (e.g., FILE_SHARE_READ, FILE_SHARE_WRITE, FILE_SHARE_DELETE)
+  //
+  // For emulation, we just acknowledge the call without enforcing sharing rules
+
+  XELOGD(
+      "IoSetShareAccess(desired_access={:08X}, share_access={:08X}, "
+      "file_object={:08X}, share_access_out={:08X}) - stubbed",
+      desired_access, share_access, file_object.guest_address(),
+      share_access_out.guest_address());
+
+  // In a real implementation, we would initialize the share_access structure
+  // with the current access and sharing mode. For now, we do nothing.
+}
+DECLARE_XBOXKRNL_EXPORT1(IoSetShareAccess, kFileSystem, kStub);
+
+void IoRemoveShareAccess_entry(lpvoid_t file_object,
+                                lpvoid_t share_access) {
+  // IoRemoveShareAccess removes the share access information from a file object
+  // Called when closing a file to update the sharing state
+  //
+  // For emulation, we just acknowledge the call
+
+  XELOGD(
+      "IoRemoveShareAccess(file_object={:08X}, share_access={:08X}) - stubbed",
+      file_object.guest_address(), share_access.guest_address());
+
+  // In a real implementation, we would decrement reference counts in the
+  // share_access structure. For now, we do nothing.
+}
+DECLARE_XBOXKRNL_EXPORT1(IoRemoveShareAccess, kFileSystem, kStub);
+
+dword_result_t IoCheckShareAccess_entry(
+    dword_t desired_access, dword_t share_access,
+    lpvoid_t file_object,
+    lpvoid_t share_access_state, dword_t update) {
+  // IoCheckShareAccess checks if the requested access is compatible with
+  // current sharing mode. Called when opening a file that's already open.
+  //
+  // Returns STATUS_SUCCESS if access is allowed,
+  // STATUS_SHARING_VIOLATION if not
+  //
+  // For emulation, we always allow access
+
+  XELOGD(
+      "IoCheckShareAccess(desired_access={:08X}, share_access={:08X}, "
+      "file_object={:08X}, share_access_state={:08X}, update={}) - stubbed, "
+      "allowing access",
+      desired_access, share_access, file_object.guest_address(),
+      share_access_state.guest_address(), update);
+
+  // Always return success to allow file access
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoCheckShareAccess, kFileSystem, kStub);
+
+void IoCompleteRequest_entry(dword_t irp_ptr, dword_t priority_boost) {
+  // IoCompleteRequest completes an I/O request packet (IRP)
+  // This is called by drivers when they finish processing an I/O operation
+  // The priority_boost parameter can be used to boost the priority of the
+  // thread that initiated the I/O
+  //
+  // For emulation, we just acknowledge the call
+
+  XELOGD("IoCompleteRequest(irp={:08X}, priority_boost={}) - stubbed", irp_ptr,
+         priority_boost);
+
+  // In a real implementation, we would:
+  // 1. Mark the IRP as complete
+  // 2. Call completion routines
+  // 3. Signal events
+  // 4. Boost thread priority if requested
+  // For now, we do nothing.
+}
+DECLARE_XBOXKRNL_EXPORT1(IoCompleteRequest, kFileSystem, kStub);
+
+dword_result_t IoInvalidDeviceRequest_entry(dword_t device_object,
+                                             dword_t irp_ptr) {
+  // IoInvalidDeviceRequest is a generic handler for unsupported I/O requests
+  // Drivers use this for dispatch table entries they don't implement
+  // It simply returns STATUS_NOT_SUPPORTED
+  //
+  // This is commonly used as a placeholder in driver dispatch tables
+
+  XELOGD(
+      "IoInvalidDeviceRequest(device={:08X}, irp={:08X}) - returning "
+      "STATUS_NOT_SUPPORTED",
+      device_object, irp_ptr);
+
+  // Return the standard "not supported" error code
+  return X_STATUS_NOT_SUPPORTED;
+}
+DECLARE_XBOXKRNL_EXPORT1(IoInvalidDeviceRequest, kFileSystem, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

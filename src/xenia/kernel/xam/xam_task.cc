@@ -72,6 +72,17 @@ DECLARE_XAM_EXPORT2(XamTaskSchedule, kNone, kImplemented, kSketchy);
 dword_result_t XamTaskShouldExit_entry(dword_t r3) { return 0; }
 DECLARE_XAM_EXPORT2(XamTaskShouldExit, kNone, kStub, kSketchy);
 
+dword_result_t XamTaskCloseHandle_entry(dword_t task_handle) {
+  // XamTaskCloseHandle closes a handle created by XamTaskSchedule
+  // For emulation purposes, we don't actually track task handles,
+  // so this is just a stub that returns success
+
+  XELOGD("XamTaskCloseHandle(handle={:08X}) - stubbed", task_handle);
+
+  return X_STATUS_SUCCESS;
+}
+DECLARE_XAM_EXPORT2(XamTaskCloseHandle, kNone, kStub, kSketchy);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe

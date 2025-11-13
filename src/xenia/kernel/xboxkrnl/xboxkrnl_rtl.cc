@@ -669,6 +669,35 @@ void RtlUnwind_entry(lpvoid_t target_frame, lpvoid_t target_ip,
 }
 DECLARE_XBOXKRNL_EXPORT1(RtlUnwind, kThreading, kStub);
 
+dword_result_t __C_specific_handler_entry(lpvoid_t exception_record,
+                                           lpvoid_t establisher_frame,
+                                           lpvoid_t context_record,
+                                           lpvoid_t dispatcher_context) {
+  // __C_specific_handler is the C++ language-specific exception handler
+  // It's part of the structured exception handling (SEH) framework
+  // Called when an exception occurs in C++ code to find appropriate handlers
+  //
+  // This is used by games compiled with Microsoft C++ compiler
+  // For emulation, we return EXCEPTION_CONTINUE_SEARCH to let the system
+  // continue searching for exception handlers up the stack
+
+  XELOGD(
+      "__C_specific_handler(exception_record={:08X}, establisher_frame={:08X}, "
+      "context_record={:08X}, dispatcher_context={:08X}) - stubbed, returning "
+      "EXCEPTION_CONTINUE_SEARCH",
+      exception_record.guest_address(), establisher_frame.guest_address(),
+      context_record.guest_address(), dispatcher_context.guest_address());
+
+  // Return codes:
+  // 0 = EXCEPTION_EXECUTE_HANDLER - Execute the exception handler
+  // 1 = EXCEPTION_CONTINUE_SEARCH - Continue searching for handlers
+  // -1 = EXCEPTION_CONTINUE_EXECUTION - Continue execution at exception point
+
+  // Return EXCEPTION_CONTINUE_SEARCH (1) - let the system continue looking
+  return 1;
+}
+DECLARE_XBOXKRNL_EXPORT1(__C_specific_handler, kThreading, kStub);
+
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe

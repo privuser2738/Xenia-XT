@@ -414,6 +414,68 @@ dword_result_t XamContentDeleteInternal_entry(lpvoid_t content_data_ptr,
 }
 DECLARE_XAM_EXPORT1(XamContentDeleteInternal, kContent, kImplemented);
 
+dword_result_t XamMediaVerificationCreate_entry(dword_t flags,
+                                                lpvoid_t buffer_ptr,
+                                                dword_t buffer_size,
+                                                lpdword_t handle_out) {
+  // XamMediaVerificationCreate creates a media verification handle used to
+  // verify the integrity of disc media. This is used by games like Rayman
+  // Legends to detect pirated or modified discs. For emulation, we create
+  // a fake handle and always report verification success.
+  XELOGD(
+      "XamMediaVerificationCreate(flags={:08X}, buffer={:08X}, size={:X}, "
+      "handle_out={:08X}) - stubbed",
+      flags, buffer_ptr.guest_address(), buffer_size,
+      handle_out.guest_address());
+
+  // Return a fake handle value
+  *handle_out = 0xDEADBEEF;
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamMediaVerificationCreate, kContent, kStub);
+
+dword_result_t XamMediaVerificationClose_entry(dword_t handle) {
+  // XamMediaVerificationClose closes a media verification handle created by
+  // XamMediaVerificationCreate. For emulation, we just acknowledge the close.
+  XELOGD("XamMediaVerificationClose(handle={:08X}) - stubbed", handle);
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamMediaVerificationClose, kContent, kStub);
+
+dword_result_t XamMediaVerificationVerify_entry(dword_t handle,
+                                                lpunknown_t overlapped_ptr) {
+  // XamMediaVerificationVerify performs the actual verification of disc media.
+  // This checks sector hashes and signatures to detect tampering. For
+  // emulation, we always report success since we're running from ISO files.
+  XELOGD("XamMediaVerificationVerify(handle={:08X}, overlapped={:08X}) - "
+         "stubbed returning success",
+         handle, overlapped_ptr.guest_address());
+
+  if (overlapped_ptr) {
+    kernel_state()->CompleteOverlappedImmediate(overlapped_ptr,
+                                                X_ERROR_SUCCESS);
+    return X_ERROR_IO_PENDING;
+  }
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamMediaVerificationVerify, kContent, kStub);
+
+dword_result_t XamMediaVerificationFailedBlocks_entry(dword_t handle,
+                                                      lpdword_t
+                                                          failed_blocks_out) {
+  // XamMediaVerificationFailedBlocks returns the number of blocks that failed
+  // verification. For emulation, we always report 0 failed blocks (perfect
+  // verification).
+  XELOGD(
+      "XamMediaVerificationFailedBlocks(handle={:08X}, failed_blocks_out={:08X}"
+      ") - stubbed returning 0 failed blocks",
+      handle, failed_blocks_out.guest_address());
+
+  *failed_blocks_out = 0;  // No failed blocks
+  return X_ERROR_SUCCESS;
+}
+DECLARE_XAM_EXPORT1(XamMediaVerificationFailedBlocks, kContent, kStub);
+
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe
