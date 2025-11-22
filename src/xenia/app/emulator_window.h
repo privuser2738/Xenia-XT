@@ -129,7 +129,9 @@ class EmulatorWindow {
   void OnKeyDown(ui::KeyEvent& e);
   void FileDrop(const std::filesystem::path& filename);
   void FileOpen();
+  void FileOpenFolder();
   void FileClose();
+  void CheckForUpdates();
   void ShowContentDirectory();
   void CpuTimeScalarReset();
   void CpuTimeScalarSetHalf();

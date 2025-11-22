@@ -32,6 +32,7 @@
 #include "xenia/emulator.h"
 #include "xenia/gpu/command_processor.h"
 #include "xenia/gpu/graphics_system.h"
+#include "xenia/app/update_checker.h"
 #include "xenia/ui/file_picker.h"
 #include "xenia/ui/graphics_provider.h"
 #include "xenia/ui/imgui_dialog.h"
@@ -512,6 +513,9 @@ bool EmulatorWindow::Initialize() {
     file_menu->AddChild(
         MenuItem::Create(MenuItem::Type::kString, "&Open...", "Ctrl+O",
                          std::bind(&EmulatorWindow::FileOpen, this)));
+    file_menu->AddChild(
+        MenuItem::Create(MenuItem::Type::kString, "Open &Folder...", "Ctrl+Shift+O",
+                         std::bind(&EmulatorWindow::FileOpenFolder, this)));
 #ifdef DEBUG
     file_menu->AddChild(
         MenuItem::Create(MenuItem::Type::kString, "Close",
@@ -628,6 +632,9 @@ bool EmulatorWindow::Initialize() {
               "..." XE_BUILD_BRANCH);
         }));
     help_menu->AddChild(MenuItem::Create(MenuItem::Type::kSeparator));
+    help_menu->AddChild(MenuItem::Create(
+        MenuItem::Type::kString, "Check for &Updates...",
+        std::bind(&EmulatorWindow::CheckForUpdates, this)));
     help_menu->AddChild(MenuItem::Create(
         MenuItem::Type::kString, "&About...",
         [this]() { LaunchWebBrowser("https://xenia.jp/about/"); }));
@@ -871,6 +878,38 @@ void EmulatorWindow::FileOpen() {
   }
 }
 
+
+void EmulatorWindow::FileOpenFolder() {
+  std::filesystem::path path;
+
+  auto file_picker = xe::ui::FilePicker::Create();
+  file_picker->set_mode(ui::FilePicker::Mode::kOpen);
+  file_picker->set_type(ui::FilePicker::Type::kDirectory);
+  file_picker->set_multi_selection(false);
+  file_picker->set_title("Select Game Folder (extracted disc contents)");
+  if (file_picker->Show(window_.get())) {
+    auto selected_files = file_picker->selected_files();
+    if (!selected_files.empty()) {
+      path = selected_files[0];
+    }
+  }
+
+  if (!path.empty()) {
+    // Close any currently running title before launching a new one
+    if (emulator_->is_title_open()) {
+      XELOGI("Closing current title before loading folder...");
+      emulator_->TerminateTitle();
+    }
+
+    // Normalize the path and make absolute.
+    auto abs_path = std::filesystem::absolute(path);
+    auto result = emulator_->LaunchFolder(abs_path);
+    if (XFAILED(result)) {
+      XELOGE("Failed to launch folder: {:08X}", result);
+    }
+  }
+}
+
 void EmulatorWindow::FileClose() {
   if (emulator_->is_title_open()) {
     emulator_->TerminateTitle();
@@ -1022,6 +1061,35 @@ void EmulatorWindow::ShowBuildCommit() {
   LaunchWebBrowser(
       "https://github.com/xenia-project/xenia/commit/" XE_BUILD_COMMIT);
 #endif
+}
+
+
+void EmulatorWindow::CheckForUpdates() {
+  // Check for updates using GitHub Releases API
+  XELOGI("Checking for updates...");
+
+  // Use shared_ptr so the checker lives until the async callback completes
+  auto checker = std::make_shared<UpdateChecker>();
+  checker->CheckForUpdatesAsync([this, checker](bool success, const UpdateInfo& info) {
+    if (success && info.is_newer) {
+      XELOGI("Update available: {} (current: {})", info.version,
+             UpdateChecker::GetCurrentVersion());
+      // Launch browser to show the release page
+      app_context_.CallInUIThread([info]() {
+        LaunchWebBrowser(info.download_url.empty()
+                             ? UpdateChecker::GetReleasesUrl()
+                             : info.download_url);
+      });
+    } else if (success) {
+      XELOGI("No updates available. Current version is up to date.");
+    } else {
+      XELOGE("Failed to check for updates.");
+      // Fall back to opening releases page
+      app_context_.CallInUIThread([]() {
+        LaunchWebBrowser(UpdateChecker::GetReleasesUrl());
+      });
+    }
+  });
 }
 
 void EmulatorWindow::UpdateTitle() {

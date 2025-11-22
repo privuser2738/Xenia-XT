@@ -111,6 +111,7 @@ project("xenia-app")
       "xenia-hid-winkey",
       "xenia-hid-xinput",
       "xenia-ui-d3d12",
+      "winhttp",  -- For update checker
     })
 
   filter({"platforms:Windows", SINGLE_LIBRARY_FILTER})

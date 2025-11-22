@@ -348,6 +348,12 @@ X_STATUS Emulator::LaunchPath(const std::filesystem::path& path) {
 
   // Launch based on file type.
   // This is a silly guess based on file extension.
+  // First check if it is a directory (folder with extracted disc contents)
+  if (std::filesystem::is_directory(path)) {
+    XELOGI("LaunchPath: Detected directory, launching as folder");
+    return LaunchFolder(path);
+  }
+
   if (!path.has_extension()) {
     // Likely an STFS container.
     XELOGI("LaunchPath: Detected STFS container (no extension)");
@@ -445,6 +451,41 @@ X_STATUS Emulator::LaunchStfsContainer(const std::filesystem::path& path) {
 
   // Launch the game.
   auto module_path(FindLaunchModule());
+  return CompleteLaunch(path, module_path);
+}
+
+
+X_STATUS Emulator::LaunchFolder(const std::filesystem::path& path) {
+  XELOGI("=== LaunchFolder: Attempting to launch folder '{}'", xe::path_to_utf8(path));
+
+  // Verify the path is a directory
+  if (!std::filesystem::is_directory(path)) {
+    xe::FatalError("LaunchFolder: Path is not a directory.");
+    return X_STATUS_INVALID_PARAMETER;
+  }
+
+  // Mount the folder as a disc-like device (similar to extracted ISO)
+  auto mount_path = "\\Device\\Cdrom0";
+
+  // Register the folder in the virtual filesystem using HostPathDevice
+  auto device =
+      std::make_unique<vfs::HostPathDevice>(mount_path, path, true);
+  if (!device->Initialize()) {
+    xe::FatalError("Unable to scan folder; directory not accessible.");
+    return X_STATUS_NO_SUCH_FILE;
+  }
+  if (!file_system_->RegisterDevice(std::move(device))) {
+    xe::FatalError("Unable to register folder as device.");
+    return X_STATUS_NO_SUCH_FILE;
+  }
+
+  // Create symlinks to the device (same as disc image)
+  file_system_->RegisterSymbolicLink("game:", mount_path);
+  file_system_->RegisterSymbolicLink("d:", mount_path);
+
+  // Launch the game - FindLaunchModule will locate default.xex or GameInfo.bin
+  auto module_path(FindLaunchModule());
+  XELOGI("LaunchFolder: Found launch module: {}", module_path);
   return CompleteLaunch(path, module_path);
 }
 

@@ -84,7 +84,11 @@
       "Bash(else echo \"Build not found\")",
       "Bash(./build/bin/Windows/Release/xenia.exe:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(awk:*)",
+      "Bash(/tmp/emulator_window_new.cc)",
+      "Bash(/tmp/emulator_fixed.cc)",
+      "Bash(python3:*)"
     ],
     "deny": [],
     "ask": []

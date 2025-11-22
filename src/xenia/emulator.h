@@ -187,6 +187,10 @@ class Emulator {
   // Launches a game from an STFS container file.
   X_STATUS LaunchStfsContainer(const std::filesystem::path& path);
 
+  // Launches a game from a folder containing extracted disc contents.
+  // The folder should contain a default.xex or GameInfo.bin.
+  X_STATUS LaunchFolder(const std::filesystem::path& path);
+
   void Pause();
   void Resume();
   bool is_paused() const { return paused_; }
