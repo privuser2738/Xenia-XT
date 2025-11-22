@@ -895,15 +895,10 @@ void EmulatorWindow::FileOpenFolder() {
   }
 
   if (!path.empty()) {
-    // Close any currently running title before launching a new one
-    if (emulator_->is_title_open()) {
-      XELOGI("Closing current title before loading folder...");
-      emulator_->TerminateTitle();
-    }
-
     // Normalize the path and make absolute.
+    // Use LaunchPath which handles cleanup and routes to LaunchFolder for directories
     auto abs_path = std::filesystem::absolute(path);
-    auto result = emulator_->LaunchFolder(abs_path);
+    auto result = emulator_->LaunchPath(abs_path);
     if (XFAILED(result)) {
       XELOGE("Failed to launch folder: {:08X}", result);
     }
