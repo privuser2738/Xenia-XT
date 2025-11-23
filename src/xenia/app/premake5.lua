@@ -83,8 +83,13 @@ project("xenia-app")
       "main_resources.rc",
     })
 
+  -- Disable AVX for main_init_win.cc so our AVX check doesn't use AVX instructions.
+  -- On x64, SSE2 is the baseline and we just need to NOT enable AVX.
+  -- On x86, we use IA32 to disable all SIMD extensions.
+  filter({"architecture:x86", "files:../base/main_init_"..platform_suffix..".cc"})
+    vectorextensions("IA32")
   filter({"architecture:x86_64", "files:../base/main_init_"..platform_suffix..".cc"})
-    vectorextensions("IA32")  -- Disable AVX for main_init_win.cc so our AVX check doesn't use AVX instructions.
+    vectorextensions("SSE2")  -- x64 baseline, prevents AVX being used
 
   filter("platforms:not Android-*")
     links({

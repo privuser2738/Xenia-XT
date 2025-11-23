@@ -105,7 +105,8 @@
       "Bash(make:*)",
       "Bash(./build-linux.sh:*)",
       "Bash(./xb build:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(./build-windows.bat)"
     ],
     "deny": [],
     "ask": []

@@ -1,8 +1,215 @@
-Building Debug...
+============================================================================
+Xenia Windows Build - Release
+============================================================================
+
+[BUILD] Building Release configuration...
+
+Building Release...
+
+- running premake...
+Building configurations...
+    Baking aes_128...
+    Baking capstone...
+    Baking dxbc...
+    Baking discord-rpc...
+    Baking cxxopts...
+    Baking cpptoml...
+    Baking libavcodec...
+    Baking libavutil...
+    Baking fmt...
+    Baking glslang-spirv...
+    Baking imgui...
+    Baking mspack...
+    Baking snappy...
+    Baking xxhash...
+    Baking SDL2...
+    Baking xenia-core...
+    Baking xenia-app...
+    Baking xenia-app-discord...
+    Baking xenia-apu...
+    Baking xenia-apu-nop...
+    Baking xenia-base...
+    Baking xenia-base-tests...
+    Baking xenia-cpu...
+    Baking xenia-cpu-tests...
+    Baking xenia-cpu-ppc-tests...
+    Baking xenia-cpu-backend-x64...
+    Baking xenia-debug-ui...
+    Baking xenia-gpu...
+    Baking xenia-gpu-shader-compiler...
+    Baking xenia-gpu-null...
+    Baking xenia-gpu-vulkan...
+    Baking xenia-gpu-vulkan-trace-viewer...
+    Baking xenia-gpu-vulkan-trace-dump...
+    Baking xenia-hid...
+    Baking xenia-hid-demo...
+    Baking xenia-hid-nop...
+    Baking xenia-kernel...
+    Baking xenia-ui...
+    Baking xenia-ui-vulkan...
+    Baking xenia-ui-window-vulkan-demo...
+    Baking xenia-vfs...
+    Baking xenia-vfs-dump...
+    Baking xenia-vfs-tests...
+    Baking xenia-apu-sdl...
+    Baking xenia-helper-sdl...
+    Baking xenia-hid-sdl...
+    Baking xenia-apu-xaudio2...
+    Baking xenia-gpu-d3d12...
+    Baking xenia-gpu-d3d12-trace-viewer...
+    Baking xenia-gpu-d3d12-trace-dump...
+    Baking xenia-hid-winkey...
+    Baking xenia-hid-xinput...
+    Baking xenia-ui-d3d12...
+    Baking xenia-ui-window-d3d12-demo...
+Running action 'vs2022'...
+Done (1583ms).
 
 Found Visual Studio msbuild at: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
 Set VCTargetsPath=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\
 - building...
 
-c:\Users\rob\komod\xenia\build\xenia.sln.metaproj : error MSB4126: The specified solution configuration "Debug|Windows|x64" is invalid. Please specify a valid solution configuration using the Configuration and Platform properties (e.g. MSBuild.exe Solution.sln /p:Configuration=Debug /p:Platform="Any CPU") or leave those properties blank to use the default solution configuration. [c:\Users\rob\komod\xenia\build\xenia.sln]
-ERROR: Build failed.
+  fmt.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\fmt.lib
+  discord-rpc.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\discord-rpc.lib
+  dxbc.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\dxbc.lib
+  imgui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\imgui.lib
+  snappy.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\snappy.lib
+  xxhash.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xxhash.lib
+  capstone.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\capstone.lib
+  glslang-spirv.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\glslang-spirv.lib
+  xenia-app-discord.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-app-discord.lib
+  aes_128.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\aes_128.lib
+  libavutil.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\libavutil.lib
+  main_win.cc
+  SDL2.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\SDL2.lib
+  libavcodec.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\libavcodec.lib
+  xenia-helper-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-helper-sdl.lib
+  xenia-base.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-base.lib
+  xenia-core.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-core.lib
+  xenia-hid.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid.lib
+  xenia-apu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu.lib
+  xenia-vfs.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs.lib
+  xenia-ui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui.lib
+  mspack.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\mspack.lib
+  Generating code
+  88 of 12964 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    104 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  xenia-base-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-base-tests.exe
+  xenia-apu-nop.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-nop.lib
+  xenia-apu-xaudio2.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-xaudio2.lib
+  xenia-hid-xinput.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-xinput.lib
+  xenia-apu-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-sdl.lib
+  xenia-hid-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-sdl.lib
+  xenia-hid-nop.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-nop.lib
+  xenia-hid-winkey.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-winkey.lib
+  xenia-ui-d3d12.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-d3d12.lib
+  xenia-ui-vulkan.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-vulkan.lib
+  xenia-cpu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu.lib
+  xenia-debug-ui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-debug-ui.lib
+  xenia-cpu-backend-x64.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-backend-x64.lib
+  trace_writer.cc
+  xenia-kernel.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-kernel.lib
+  Generating code
+  Generating code
+  35 of 6359 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    22 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  109 of 10484 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    123 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  xenia-vfs-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs-dump.exe
+  Generating code
+  xenia-vfs-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs-tests.exe
+  xenia-gpu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu.lib
+  xenia-gpu-null.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-null.lib
+  xenia-gpu-vulkan.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan.lib
+  Generating code
+  Generating code
+  37 of 18865 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    40 functions had inline decision re-evaluated but remain unchanged
+  Generating code
+  Finished generating code
+  8 of 11656 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    111 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  5 of 11425 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    42 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  xenia-cpu-ppc-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-ppc-tests.exe
+  xenia-ui-window-vulkan-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-window-vulkan-demo.exe
+  114 of 33722 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    147 functions had inline decision re-evaluated but remain unchanged
+  xenia-gpu-shader-compiler.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-shader-compiler.exe
+  Finished generating code
+  Generating code
+  xenia-cpu-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-tests.exe
+  xenia-gpu-d3d12.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12.lib
+  emulator_window.cc
+  update_checker.cc
+  3 of 15813 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    80 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Generating code
+  xenia-hid-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-demo.exe
+  8 of 10363 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    111 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  xenia-ui-window-d3d12-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-window-d3d12-demo.exe
+     Creating library bin\Windows\Release\xenia-gpu-vulkan-trace-dump.lib and object bin\Windows\Release\xenia-gpu-vulkan-trace-dump.exp
+     Creating library bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.lib and object bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.exp
+  Generating code
+  Generating code
+     Creating library bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.lib and object bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.exp
+  Generating code
+     Creating library bin\Windows\Release\xenia-gpu-d3d12-trace-dump.lib and object bin\Windows\Release\xenia-gpu-d3d12-trace-dump.exp
+  Generating code
+  65 of 54830 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    254 functions had inline decision re-evaluated but remain unchanged
+  203 of 53594 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    388 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Finished generating code
+     Creating library bin\Windows\Release\xenia.lib and object bin\Windows\Release\xenia.exp
+  Generating code
+  67 of 51099 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    260 functions had inline decision re-evaluated but remain unchanged
+  203 of 49836 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    379 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  Finished generating code
+  xenia-gpu-vulkan-trace-viewer.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.exe
+  xenia-gpu-vulkan-trace-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan-trace-dump.exe
+  xenia-gpu-d3d12-trace-viewer.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.exe
+  xenia-gpu-d3d12-trace-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12-trace-dump.exe
+  20 of 70373 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    295 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  xenia-app.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia.exe
+
+Success
+
+[BUILD] Build completed successfully
+
+[DIST] Creating distribution folder...
+
+[DIST] Cleaning old distribution files...
+C:\Users\rob\source\001\xenia\dist\xenia.exe
+Access is denied.
+[DIST] Copying xenia.exe...
+The process cannot access the file because it is being used by another process.
+[ERROR] Failed to copy xenia.exe

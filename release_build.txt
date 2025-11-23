@@ -1,0 +1,1151 @@
+Building Release...
+
+- running premake...
+Building configurations...
+    Baking aes_128...
+    Baking capstone...
+    Baking dxbc...
+    Baking discord-rpc...
+    Baking cxxopts...
+    Baking cpptoml...
+    Baking libavcodec...
+    Baking libavutil...
+    Baking fmt...
+    Baking glslang-spirv...
+    Baking imgui...
+    Baking mspack...
+    Baking snappy...
+    Baking xxhash...
+    Baking SDL2...
+    Baking xenia-core...
+    Baking xenia-app...
+    Baking xenia-app-discord...
+    Baking xenia-apu...
+    Baking xenia-apu-nop...
+    Baking xenia-base...
+    Baking xenia-base-tests...
+    Baking xenia-cpu...
+    Baking xenia-cpu-tests...
+    Baking xenia-cpu-ppc-tests...
+    Baking xenia-cpu-backend-x64...
+    Baking xenia-debug-ui...
+    Baking xenia-gpu...
+    Baking xenia-gpu-shader-compiler...
+    Baking xenia-gpu-null...
+    Baking xenia-gpu-vulkan...
+    Baking xenia-gpu-vulkan-trace-viewer...
+    Baking xenia-gpu-vulkan-trace-dump...
+    Baking xenia-hid...
+    Baking xenia-hid-demo...
+    Baking xenia-hid-nop...
+    Baking xenia-kernel...
+    Baking xenia-ui...
+    Baking xenia-ui-vulkan...
+    Baking xenia-ui-window-vulkan-demo...
+    Baking xenia-vfs...
+    Baking xenia-vfs-dump...
+    Baking xenia-vfs-tests...
+    Baking xenia-apu-sdl...
+    Baking xenia-helper-sdl...
+    Baking xenia-hid-sdl...
+    Baking xenia-apu-xaudio2...
+    Baking xenia-gpu-d3d12...
+    Baking xenia-gpu-d3d12-trace-viewer...
+    Baking xenia-gpu-d3d12-trace-dump...
+    Baking xenia-hid-winkey...
+    Baking xenia-hid-xinput...
+    Baking xenia-ui-d3d12...
+    Baking xenia-ui-window-d3d12-demo...
+Running action 'vs2022'...
+Done (904ms).
+
+Found Visual Studio msbuild at: C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
+Set VCTargetsPath=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\
+- building...
+
+  aes.c
+  DXBCChecksum.cpp
+  xxhash.c
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  MCInst.c
+  MCInstrDesc.c
+  snappy-sinksource.cc
+  MCRegisterInfo.c
+  snappy-stubs-internal.cc
+  format.cc
+  SStream.c
+  X86ATTInstPrinter.c
+  InReadableOrder.cpp
+  os.cc
+  snappy.cc
+  X86Disassembler.c
+  connection_win.cpp
+  X86DisassemblerDecoder.c
+  Logger.cpp
+  discord_register_win.cpp
+  X86IntelInstPrinter.c
+  SPVRemapper.cpp
+  SpvBuilder.cpp
+  disassemble.cpp
+  doc.cpp
+  X86Mapping.c
+  X86Module.c
+  cs.c
+  discord_rpc.cpp
+  rpc_connection.cpp
+  utils.c
+  serialization.cpp
+  SDL.c
+  SDL_assert.c
+  SDL_dataqueue.c
+  SDL_error.c
+  SDL_guid.c
+  SDL_hints.c
+  SDL_list.c
+  SDL_log.c
+  SDL_utils.c
+  SDL_atomic.c
+  adler32.c
+  SDL_spinlock.c
+  SDL_audio.c
+  SDL_audiocvt.c
+  aes.c
+  aes_ctr.c
+  SDL_audiodev.c
+  audio_fifo.c
+  SDL_audiotypecvt.c
+  avsscanf.c
+  SDL_mixer.c
+  avstring.c
+  SDL_wave.c
+  SDL_directsound.c
+  SDL_diskaudio.c
+  SDL_dummyaudio.c
+  base64.c
+  blowfish.c
+  SDL_wasapi.c
+  SDL_wasapi_win32.c
+  SDL_winmm.c
+  SDL_hid.c
+  SDL_immdevice.c
+  SDL_windows.c
+  SDL_xinput.c
+  SDL_cpuinfo.c
+  SDL_dynapi.c
+  bprint.c
+  SDL_clipboardevents.c
+  buffer.c
+  camellia.c
+  cast5.c
+  SDL_displayevents.c
+  channel_layout.c
+  SDL_dropevents.c
+  color_utils.c
+  cpu.c
+  crc.c
+  des.c
+  dict.c
+  display.c
+  dovi_meta.c
+  downmix_info.c
+  encryption_info.c
+  error.c
+  eval.c
+  fifo.c
+  file.c
+  file_open.c
+  film_grain_params.c
+  fixed_dsp.c
+  float_dsp.c
+  frame.c
+  hash.c
+  aes_128.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\aes_128.lib
+  dxbc.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\dxbc.lib
+  xxhash.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xxhash.lib
+  SDL_events.c
+  SDL_gesture.c
+  SDL_keyboard.c
+  SDL_mouse.c
+  SDL_quit.c
+  SDL_touch.c
+  SDL_windowevents.c
+  SDL_rwops.c
+  SDL_sysfilesystem.c
+  SDL_haptic.c
+  SDL_syshaptic.c
+  SDL_dinputhaptic.c
+  SDL_windowshaptic.c
+  SDL_xinputhaptic.c
+  SDL_hidapi.c
+  SDL_gamecontroller.c
+  SDL_joystick.c
+  hdr_dynamic_metadata.c
+  hmac.c
+  hwcontext.c
+  controller_type.c
+  imgutils.c
+  integer.c
+  intmath.c
+  lfg.c
+  SDL_sysjoystick.c
+  SDL_hidapi_combined.c
+  SDL_hidapi_gamecube.c
+  SDL_hidapi_luna.c
+  SDL_hidapi_ps4.c
+  SDL_hidapi_ps5.c
+  SDL_hidapi_rumble.c
+  lls.c
+  log.c
+  log2_tab.c
+  mastering_display_metadata.c
+  mathematics.c
+  md5.c
+  mem.c
+  murmur3.c
+  opt.c
+  parseutils.c
+  pixdesc.c
+  pixelutils.c
+  SDL_hidapi_shield.c
+  SDL_hidapi_stadia.c
+  SDL_hidapi_switch.c
+  SDL_hidapi_xbox360.c
+  SDL_hidapi_xbox360w.c
+  SDL_hidapi_xboxone.c
+  SDL_hidapijoystick.c
+  SDL_virtualjoystick.c
+  SDL_dinputjoystick.c
+  SDL_rawinputjoystick.c
+  SDL_windows_gaming_input.c
+  random_seed.c
+  SDL_windowsjoystick.c
+  rational.c
+  rc4.c
+  SDL_xinputjoystick.c
+  e_atan2.c
+  e_exp.c
+  reverse.c
+  ripemd.c
+  e_fmod.c
+  e_log.c
+  e_log10.c
+  samplefmt.c
+  e_pow.c
+  e_rem_pio2.c
+  sha.c
+  sha512.c
+  e_sqrt.c
+  slicethread.c
+  k_cos.c
+  k_rem_pio2.c
+  k_sin.c
+  k_tan.c
+  s_atan.c
+  spherical.c
+  s_copysign.c
+  s_cos.c
+  s_fabs.c
+  stereo3d.c
+  tea.c
+  capstone.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\capstone.lib
+  threadmessage.c
+  s_floor.c
+  s_scalbn.c
+  s_sin.c
+  s_tan.c
+  time.c
+  timecode.c
+  SDL_sysloadso.c
+  SDL_locale.c
+  tree.c
+  SDL_syslocale.c
+  snappy.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\snappy.lib
+  twofish.c
+  tx.c
+  tx_double.c
+  SDL_url.c
+  SDL_sysurl.c
+  tx_float.c
+  SDL_power.c
+  SDL_syspower.c
+  tx_int32.c
+  utils.c
+  video_enc_params.c
+  fixed_dsp_init.c
+  SDL_d3dmath.c
+  SDL_render.c
+  SDL_yuv_sw.c
+  float_dsp_init.c
+  imgutils_init.c
+  lls_init.c
+  xga_font_data.c
+  xtea.c
+  SDL_render_d3d.c
+  SDL_shaders_d3d.c
+  SDL_render_d3d11.c
+  SDL_shaders_d3d11.c
+  SDL_render_d3d12.c
+  SDL_shaders_d3d12.c
+  SDL_render_gl.c
+  SDL_shaders_gl.c
+  SDL_render_gles2.c
+  SDL_shaders_gles2.c
+  SDL_blendfillrect.c
+  SDL_blendline.c
+  SDL_blendpoint.c
+  SDL_drawline.c
+  SDL_drawpoint.c
+  SDL_render_sw.c
+  SDL_rotate.c
+  SDL_triangle.c
+  SDL_sensor.c
+  SDL_dummysensor.c
+  SDL_windowssensor.c
+  SDL_crc16.c
+  SDL_crc32.c
+  SDL_getenv.c
+  SDL_iconv.c
+  SDL_malloc.c
+  SDL_mslibc.c
+  SDL_qsort.c
+  SDL_stdlib.c
+  SDL_string.c
+  SDL_strtokr.c
+  SDL_thread.c
+  SDL_syscond.c
+  SDL_syscond_cv.c
+  imgui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\imgui.lib
+  SDL_sysmutex.c
+  SDL_syssem.c
+  SDL_systhread.c
+  SDL_systls.c
+  SDL_timer.c
+  SDL_systimer.c
+  SDL_RLEaccel.c
+  SDL_blit.c
+  SDL_blit_0.c
+  SDL_blit_1.c
+  SDL_blit_A.c
+  SDL_blit_N.c
+  SDL_blit_auto.c
+  SDL_blit_copy.c
+  SDL_blit_slow.c
+  SDL_bmp.c
+  SDL_clipboard.c
+  SDL_egl.c
+  SDL_fillrect.c
+  SDL_pixels.c
+  SDL_rect.c
+  SDL_shape.c
+  SDL_stretch.c
+  SDL_surface.c
+  SDL_video.c
+  discord-rpc.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\discord-rpc.lib
+  SDL_vulkan_utils.c
+  SDL_yuv.c
+  SDL_nullevents.c
+  SDL_nullframebuffer.c
+  SDL_nullvideo.c
+  SDL_windowsclipboard.c
+  SDL_windowsevents.c
+  SDL_windowsframebuffer.c
+  SDL_windowskeyboard.c
+  SDL_windowsmessagebox.c
+  SDL_windowsmodes.c
+  SDL_windowsmouse.c
+  SDL_windowsopengl.c
+  SDL_windowsopengles.c
+  SDL_windowsshape.c
+  SDL_windowsvideo.c
+  SDL_windowsvulkan.c
+  SDL_windowswindow.c
+  yuv_rgb.c
+  discord_presence.cc
+  fmt.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\fmt.lib
+  glslang-spirv.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\glslang-spirv.lib
+  arena.cc
+  bit_map.cc
+  bit_stream.cc
+  byte_stream.cc
+  clock.cc
+  clock_win.cc
+  clock_x64.cc
+  console_win.cc
+  crash_recovery.cc
+  cvar.cc
+  debugging_win.cc
+  exception_handler.cc
+  exception_handler_win.cc
+  filesystem.cc
+  filesystem_wildcard.cc
+  filesystem_win.cc
+  fuzzy.cc
+  game_compatibility.cc
+  host_thread_context.cc
+  logging.cc
+  main_win.cc
+  mapped_memory_win.cc
+  memory.cc
+  memory_win.cc
+  mutex.cc
+  profiling.cc
+  ring_buffer.cc
+  robust_file_io.cc
+  socket_win.cc
+  string.cc
+  string_buffer.cc
+  system_win.cc
+  threading.cc
+  threading_timer_queue.cc
+  threading_win.cc
+  utf8.cc
+  xenia-app-discord.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-app-discord.lib
+  vec128.cc
+  SDL2.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\SDL2.lib
+  sdl_helper.cc
+  cpu.c
+  libavutil.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\libavutil.lib
+  ac3_parser.c
+  adts_parser.c
+  allcodecs.c
+  avcodec.c
+  xenia-helper-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-helper-sdl.lib
+  avdct.c
+  avfft.c
+  avpacket.c
+  avpicture.c
+  bitstream.c
+  bitstream_filter.c
+  bitstream_filters.c
+  bsf.c
+  codec_desc.c
+  codec_par.c
+  d3d11va.c
+  decode.c
+  dirac.c
+  dv_profile.c
+  encode.c
+  faandct.c
+  faanidct.c
+  fdctdsp.c
+  fft_fixed_32.c
+  fft_float.c
+  fft_init_table.c
+  file_open.c
+  idctdsp.c
+  imgconvert.c
+  jfdctfst.c
+  jfdctint.c
+  jni.c
+  jrevdct.c
+  mathtables.c
+  mdct_fixed_32.c
+  mdct_float.c
+  mediacodec.c
+  mpeg12framerate.c
+  null_bsf.c
+  options.c
+  parser.c
+  parsers.c
+  profiles.c
+  pthread.c
+  pthread_frame.c
+  pthread_slice.c
+  qsv_api.c
+  raw.c
+  simple_idct.c
+  sinewin.c
+  utils.c
+  vorbis_parser.c
+  wma.c
+  wma_common.c
+  wma_freqs.c
+  constants.c
+  fdct.c
+  fdctdsp_init.c
+  fft_init.c
+  idctdsp_init.c
+  xiph.c
+  wmaprodec.c
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavutil\ffmath.h(49,28): warning C4244: 'function': conversion from 'double' to 'float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavutil\mem_internal.h(154,13): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\get_bits.h(492,5): warning C4101: 're_cache': unreferenced local variable [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\put_bits.h(78,49): warning C4244: 'return': conversion from '__int64' to 'int', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\put_bits.h(104,53): warning C4244: 'return': conversion from '__int64' to 'int', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\put_bits.h(311,24): warning C4244: 'function': conversion from 'uint64_t' to 'BitBuf', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\put_bits.h(313,23): warning C4244: 'function': conversion from 'uint64_t' to 'uint32_t', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(576,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(576,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(576,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(576,49): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(576,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(577,5): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(577,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(577,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(577,70): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(578,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(578,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(578,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(579,4): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(579,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(579,49): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(579,70): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,15): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,27): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,49): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(580,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,5): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,37): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,48): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(581,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,4): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,27): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,48): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,59): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(582,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,4): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,48): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(583,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,5): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,27): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,49): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(584,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(585,15): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(585,37): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(585,49): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(585,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,4): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,27): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,38): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,48): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(586,71): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(587,5): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(587,15): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(587,27): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(587,37): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(587,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,5): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,16): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,26): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,48): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,60): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodata.h(588,70): warning C4305: 'initializing': truncation from 'double' to 'const float' [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  (compiling source file '../third_party/FFmpeg/libavcodec/wmaprodec.c')
+  
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(368,30): warning C4244: '=': conversion from '__unaligned const uint16_t' to 'uint8_t', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(575,20): warning C4244: '=': conversion from 'double' to 'float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(759,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(963,46): warning C4244: 'function': conversion from 'uint32_t' to 'float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(964,46): warning C4244: 'function': conversion from 'uint32_t' to 'float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+C:\Users\rob\source\001\xenia\third_party\FFmpeg\libavcodec\wmaprodec.c(1396,37): warning C4244: 'initializing': conversion from 'double' to 'const float', possible loss of data [C:\Users\rob\source\001\xenia\build\libavcodec.vcxproj]
+  libavcodec.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\libavcodec.lib
+  xenia-base.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-base.lib
+  logging.cc
+  hid_flags.cc
+  input_system.cc
+  device.cc
+  disc_image_device.cc
+  disc_image_entry.cc
+  file_picker_win.cc
+  graphics_upload_buffer_pool.cc
+  graphics_util.cc
+  disc_image_file.cc
+  host_path_device.cc
+  config.cc
+  imgui_dialog.cc
+  apu_flags.cc
+  host_path_entry.cc
+  host_path_file.cc
+  emulator.cc
+  imgui_drawer.cc
+  null_device.cc
+  memory.cc
+  audio_driver.cc
+  null_entry.cc
+  console_app_main_win.cc
+  audio_system.cc
+  immediate_drawer.cc
+  null_file.cc
+  chrono_test.cc
+  stfs_container_device.cc
+  stfs_container_entry.cc
+  xma_context.cc
+  stfs_container_file.cc
+  xma_decoder.cc
+  menu_item.cc
+  memory_test.cc
+  microprofile_drawer.cc
+  threading_test.cc
+  presenter.cc
+  entry.cc
+  xma_register_file.cc
+  virtual_file_system.cc
+  renderdoc_api.cc
+  surface_win.cc
+  window.cc
+  window_win.cc
+  windowed_app.cc
+  utf8_test.cc
+  windowed_app_context.cc
+  test_suite_main.cc
+  windowed_app_context_win.cc
+  lzxd.c
+  system.c
+  mspack.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\mspack.lib
+  assembler.cc
+  backend.cc
+  null_backend.cc
+  breakpoint.cc
+  compiler.cc
+  compiler_pass.cc
+  conditional_group_pass.cc
+  conditional_group_subpass.cc
+  constant_propagation_pass.cc
+  context_promotion_pass.cc
+  control_flow_analysis_pass.cc
+  control_flow_simplification_pass.cc
+  data_flow_analysis_pass.cc
+  dead_code_elimination_pass.cc
+  finalization_pass.cc
+  memory_sequence_combination_pass.cc
+  register_allocation_pass.cc
+  simplification_pass.cc
+  validation_pass.cc
+  value_reduction_pass.cc
+  cpu_flags.cc
+  elf_module.cc
+  entry_table.cc
+  export_resolver.cc
+  function.cc
+  function_debug_info.cc
+  block.cc
+  hir_builder.cc
+  instr.cc
+  opcodes.cc
+  value.cc
+  lzx.cc
+  mmio_handler.cc
+  module.cc
+  ppc_context.cc
+  ppc_emit_altivec.cc
+  ppc_emit_alu.cc
+  ppc_emit_control.cc
+  ppc_emit_fpu.cc
+  ppc_emit_memory.cc
+  ppc_frontend.cc
+  xenia-hid.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid.lib
+  ppc_hir_builder.cc
+  ppc_opcode_disasm.cc
+  ppc_opcode_disasm_gen.cc
+  ppc_opcode_info.cc
+  ppc_opcode_lookup_gen.cc
+  ppc_opcode_table_gen.cc
+  ppc_scanner.cc
+  nop_hid.cc
+  nop_input_driver.cc
+  xinput_hid.cc
+  xinput_input_driver.cc
+  ppc_translator.cc
+  processor.cc
+  raw_module.cc
+  xenia-apu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu.lib
+  stack_walker_win.cc
+  xenia-vfs.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs.lib
+  test_module.cc
+  thread.cc
+  xaudio2_apu_flags.cc
+  xaudio2_audio_driver.cc
+  xaudio2_audio_system.cc
+  thread_state.cc
+  xex_module.cc
+  console_app_main_win.cc
+  vfs_dump.cc
+  sdl_audio_driver.cc
+  sdl_audio_system.cc
+  nop_apu_flags.cc
+  nop_audio_system.cc
+  console_app_main_win.cc
+  vfs_test.cc
+  test_suite_main.cc
+  xenia-ui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui.lib
+  sdl_hid.cc
+  d3d12_cpu_descriptor_pool.cc
+  sdl_input_driver.cc
+  d3d12_descriptor_heap_pool.cc
+  d3d12_immediate_drawer.cc
+  d3d12_presenter.cc
+  d3d12_provider.cc
+  linked_type_descriptor_set_allocator.cc
+  d3d12_submission_tracker.cc
+  d3d12_upload_buffer_pool.cc
+  single_layout_descriptor_set_pool.cc
+  spirv_tools_context.cc
+  ui_samplers.cc
+  vulkan_device.cc
+  vulkan_immediate_drawer.cc
+  d3d12_util.cc
+  d3d12_window_demo.cc
+  vulkan_instance.cc
+  vulkan_mem_alloc.cc
+  vulkan_presenter.cc
+  vulkan_provider.cc
+  vulkan_submission_tracker.cc
+  winkey_hid.cc
+  vulkan_upload_buffer_pool.cc
+  vulkan_util.cc
+  vulkan_window_demo.cc
+  winkey_input_driver.cc
+  command_processor.cc
+  draw_extent_estimator.cc
+  draw_util.cc
+  dxbc_shader.cc
+  dxbc_shader_translator.cc
+  dxbc_shader_translator_alu.cc
+  dxbc_shader_translator_fetch.cc
+  dxbc_shader_translator_memexport.cc
+  dxbc_shader_translator_om.cc
+  gpu_flags.cc
+  graphics_system.cc
+  packet_disassembler.cc
+  primitive_processor.cc
+  register_file.cc
+  registers.cc
+  render_target_cache.cc
+  sampler_info.cc
+  shader.cc
+  shader_interpreter.cc
+  shader_translator.cc
+  shader_translator_disasm.cc
+  shared_memory.cc
+  spirv_builder.cc
+  spirv_shader.cc
+  spirv_shader_translator.cc
+  spirv_shader_translator_alu.cc
+  spirv_shader_translator_fetch.cc
+  spirv_shader_translator_memexport.cc
+  spirv_shader_translator_rb.cc
+  texture_cache.cc
+  texture_conversion.cc
+  texture_dump.cc
+  xenia-core.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-core.lib
+  texture_extent.cc
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  texture_info.cc
+  texture_info_formats.cc
+  texture_util.cc
+  trace_dump.cc
+  trace_player.cc
+  trace_reader.cc
+  trace_viewer.cc
+  trace_writer.cc
+  ucode.cc
+  xenos.cc
+  xenia-hid-xinput.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-xinput.lib
+  xenia-hid-nop.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-nop.lib
+  xenia-apu-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-sdl.lib
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  xenia-apu-xaudio2.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-xaudio2.lib
+  xenia-hid-sdl.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-sdl.lib
+  xenia-hid-winkey.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-winkey.lib
+  All 12964 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-ui-d3d12.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-d3d12.lib
+  xenia-cpu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu.lib
+  d3d12_window_demo.cc
+  window_demo.cc
+  windowed_app_main_win.cc
+  Generating code
+  All 6359 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  debug_window.cc
+  Previous IPDB not found, fall back to full compilation.
+  Finished generating code
+  kernel_flags.cc
+  kernel_module.cc
+  kernel_state.cc
+  user_module.cc
+  gameinfo_utils.cc
+  native_list.cc
+  object_table.cc
+  shim_utils.cc
+  xdbf_utils.cc
+  xex_bc_analyzer.cc
+  app_manager.cc
+  xam_app.cc
+  xgi_app.cc
+  xlivebase_app.cc
+  xmp_app.cc
+  content_manager.cc
+  user_profile.cc
+  xam_avatar.cc
+  xam_content.cc
+  xam_content_aggregate.cc
+  xam_content_device.cc
+  xam_enum.cc
+  xam_info.cc
+  xam_input.cc
+  xam_locale.cc
+  xam_module.cc
+  xam_msg.cc
+  xam_net.cc
+  xam_notify.cc
+  xam_nui.cc
+  xam_party.cc
+  xam_task.cc
+  xam_ui.cc
+  xenia-ui-vulkan.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-vulkan.lib
+  xenia-vfs-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs-dump.exe
+  xam_user.cc
+  vulkan_window_demo.cc
+  window_demo.cc
+  windowed_app_main_win.cc
+  x64_assembler.cc
+  x64_backend.cc
+  x64_code_cache.cc
+  x64_code_cache_win.cc
+  x64_emitter.cc
+  x64_function.cc
+  x64_seq_control.cc
+  x64_seq_memory.cc
+  x64_seq_vector.cc
+  x64_sequences.cc
+  x64_tracers.cc
+  xam_video.cc
+  xam_voice.cc
+  xenia-base-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-base-tests.exe
+  All 10484 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-apu-nop.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-apu-nop.lib
+  xenia-vfs-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-vfs-tests.exe
+  hid_demo.cc
+  windowed_app_main_win.cc
+  xenia-gpu.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu.lib
+  null_command_processor.cc
+  console_app_main_win.cc
+  deferred_command_buffer.cc
+  d3d12_command_processor.cc
+  vulkan_command_processor.cc
+  d3d12_graphics_system.cc
+  shader_compiler_main.cc
+  vulkan_graphics_system.cc
+  d3d12_primitive_processor.cc
+  vulkan_pipeline_cache.cc
+  d3d12_render_target_cache.cc
+  null_graphics_system.cc
+  vulkan_primitive_processor.cc
+  vulkan_render_target_cache.cc
+  d3d12_shader.cc
+  vulkan_shader.cc
+  d3d12_shared_memory.cc
+  vulkan_shared_memory.cc
+  d3d12_texture_cache.cc
+  vulkan_texture_cache.cc
+  deferred_command_list.cc
+  pipeline_cache.cc
+  xbdm_misc.cc
+  xbdm_module.cc
+  cert_monitor.cc
+  debug_monitor.cc
+  xboxkrnl_audio.cc
+  xboxkrnl_audio_xma.cc
+  xboxkrnl_crypt.cc
+  xboxkrnl_debug.cc
+  xboxkrnl_error.cc
+  xboxkrnl_hal.cc
+  xboxkrnl_hid.cc
+  xboxkrnl_io.cc
+  xboxkrnl_io_info.cc
+  xboxkrnl_memory.cc
+  xboxkrnl_misc.cc
+  xboxkrnl_module.cc
+  xboxkrnl_modules.cc
+  xboxkrnl_ob.cc
+  xboxkrnl_rtl.cc
+  xboxkrnl_strings.cc
+  xboxkrnl_threading.cc
+  xboxkrnl_usbcam.cc
+  xboxkrnl_video.cc
+  xboxkrnl_xconfig.cc
+  xenumerator.cc
+  xevent.cc
+  xfile.cc
+  xiocompletion.cc
+  xmodule.cc
+  xmutant.cc
+  xnotifylistener.cc
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  xenia-debug-ui.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-debug-ui.lib
+  xobject.cc
+  xsemaphore.cc
+  xsocket.cc
+  xenia-cpu-backend-x64.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-backend-x64.lib
+  Generating code
+  xsymboliclink.cc
+  Previous IPDB not found, fall back to full compilation.
+  console_app_main_win.cc
+  ppc_testing_main.cc
+  xthread.cc
+  xtimer.cc
+  xenia-gpu-null.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-null.lib
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  xenia-gpu-d3d12.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12.lib
+  xenia-gpu-vulkan.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan.lib
+  All 10363 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Generating code
+  All 11656 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Previous IPDB not found, fall back to full compilation.
+  xenia-ui-window-d3d12-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-window-d3d12-demo.exe
+  Finished generating code
+  xenia-kernel.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-kernel.lib
+  console_app_main_win.cc
+  d3d12_trace_dump_main.cc
+  console_app_main_win.cc
+  d3d12_trace_viewer_main.cc
+  add_test.cc
+  byte_swap_test.cc
+  extract_test.cc
+  insert_test.cc
+  load_vector_shl_shr_test.cc
+  windowed_app_main_win.cc
+  pack_test.cc
+  permute_test.cc
+  sha_test.cc
+  shl_test.cc
+  shr_test.cc
+  swizzle_test.cc
+  unpack_test.cc
+  vector_add_test.cc
+  vector_max_test.cc
+  vector_min_test.cc
+  vector_rotate_left_test.cc
+  vector_sha_test.cc
+  vector_shl_test.cc
+  vector_shr_test.cc
+  test_suite_main.cc
+  xenia-ui-window-vulkan-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-ui-window-vulkan-demo.exe
+  vulkan_trace_viewer_main.cc
+  windowed_app_main_win.cc
+  console_app_main_win.cc
+  vulkan_trace_dump_main.cc
+  emulator_window.cc
+  update_checker.cc
+  xenia_main.cc
+  windowed_app_main_win.cc
+cl : command line  warning D9002: ignoring unknown option '/arch:IA32' [C:\Users\rob\source\001\xenia\build\xenia-app.vcxproj]
+  main_init_win.cc
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 11425 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-gpu-shader-compiler.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-shader-compiler.exe
+  All 15813 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-hid-demo.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-hid-demo.exe
+     Creating library bin\Windows\Release\xenia-gpu-d3d12-trace-dump.lib and object bin\Windows\Release\xenia-gpu-d3d12-trace-dump.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+     Creating library bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.lib and object bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+     Creating library bin\Windows\Release\xenia-gpu-vulkan-trace-dump.lib and object bin\Windows\Release\xenia-gpu-vulkan-trace-dump.exp
+  Generating code
+     Creating library bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.lib and object bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  Previous IPDB not found, fall back to full compilation.
+     Creating library bin\Windows\Release\xenia.lib and object bin\Windows\Release\xenia.exp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 18865 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-cpu-ppc-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-ppc-tests.exe
+  All 33722 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-cpu-tests.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-cpu-tests.exe
+  All 49836 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  All 53594 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  All 51099 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  All 54830 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-gpu-d3d12-trace-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12-trace-dump.exe
+  xenia-gpu-vulkan-trace-dump.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan-trace-dump.exe
+  xenia-gpu-d3d12-trace-viewer.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-d3d12-trace-viewer.exe
+  xenia-gpu-vulkan-trace-viewer.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia-gpu-vulkan-trace-viewer.exe
+  All 70373 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  xenia-app.vcxproj -> C:\Users\rob\source\001\xenia\build\bin\Windows\Release\xenia.exe
+
+Success
