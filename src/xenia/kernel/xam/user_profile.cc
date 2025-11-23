@@ -12,8 +12,12 @@
 #include <sstream>
 
 #include "third_party/fmt/include/fmt/format.h"
+#include "xenia/base/cvar.h"
 #include "xenia/kernel/kernel_state.h"
 #include "xenia/kernel/util/shim_utils.h"
+
+DEFINE_string(user_name, "User",
+              "User profile name (gamertag). Max 15 characters.", "User");
 
 namespace xe {
 namespace kernel {
@@ -24,7 +28,12 @@ UserProfile::UserProfile() {
   // if non-zero, it prevents the user from playing the game.
   // "You do not have permissions to perform this operation."
   xuid_ = 0xB13EBABEBABEBABE;
-  name_ = "User";
+  // Use configured user name, truncate to 15 chars (Xbox gamertag limit)
+  std::string configured_name = cvars::user_name;
+  if (configured_name.length() > 15) {
+    configured_name = configured_name.substr(0, 15);
+  }
+  name_ = configured_name.empty() ? "User" : configured_name;
 
   // https://cs.rin.ru/forum/viewtopic.php?f=38&t=60668&hilit=gfwl+live&start=195
   // https://github.com/arkem/py360/blob/master/py360/constants.py

@@ -936,10 +936,14 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
   }
 
   // Don't assert here - games can legitimately send empty resolve regions
-  // (e.g., during loading screens or transitions). Handle gracefully.
+  // (e.g., during loading screens or transitions). Handle gracefully by
+  // returning success with zero dimensions - the caller will skip the operation.
   if (x0 >= x1 || y0 >= y1) {
     XELOGW("Resolve region is empty (x: {} to {}, y: {} to {})", x0, x1, y0, y1);
-    return false;
+    // Set zero dimensions so caller knows there's nothing to do
+    info_out.coordinate_info.width_div_8 = 0;
+    info_out.height_div_8 = 0;
+    return true;  // Return success - empty resolve is valid, just nothing to do
   }
 
   info_out.coordinate_info.width_div_8 =

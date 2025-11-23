@@ -1110,11 +1110,23 @@ bool BaseHeap::Decommit(uint32_t address, uint32_t size) {
 bool BaseHeap::Release(uint32_t base_address, uint32_t* out_region_size) {
   auto global_lock = global_critical_region_.Acquire();
 
-  // Given address must be a region base address.
-  uint32_t base_page_number = (base_address - heap_base_) / page_size_;
+  // Get the page number for the given address
+  uint32_t page_number = (base_address - heap_base_) / page_size_;
+  auto page_entry = page_table_[page_number];
+  
+  // If the address is not a region start, find the actual region start
+  // This matches Xbox 360 behavior where NtFreeVirtualMemory can accept
+  // any address within an allocated region
+  uint32_t base_page_number = page_entry.base_address;
+  if (base_page_number != page_number) {
+    XELOGW("BaseHeap::Release: Address {:08X} is not region start, using base {:08X}",
+           base_address, heap_base_ + base_page_number * page_size_);
+  }
   auto base_page_entry = page_table_[base_page_number];
-  if (base_page_entry.base_address != base_page_number) {
-    XELOGE("BaseHeap::Release failed because address is not a region start");
+  
+  // Verify this is actually an allocated region
+  if (!(base_page_entry.state & kMemoryAllocationReserve)) {
+    XELOGE("BaseHeap::Release failed: address {:08X} not in allocated region", base_address);
     return false;
   }
 

@@ -10,6 +10,7 @@
 #include "xenia/emulator.h"
 
 #include <algorithm>
+#include <atomic>
 #include <cinttypes>
 
 #include "config.h"
@@ -767,15 +768,22 @@ bool Emulator::ExceptionCallback(Exception* ex) {
   }
 
   // Display a dialog telling the user the guest has crashed.
-  if (display_window_ && imgui_drawer_) {
-    display_window_->app_context().CallInUIThreadSynchronous([this]() {
-      xe::ui::ImGuiDialog::ShowMessageBox(
-          imgui_drawer_, "Uh-oh!",
+  // Use a static flag to prevent showing multiple dialogs in a crash loop
+  static std::atomic<bool> crash_dialog_shown{false};
+  bool expected = false;
+  if (crash_dialog_shown.compare_exchange_strong(expected, true)) {
+    if (display_window_ && imgui_drawer_) {
+      display_window_->app_context().CallInUIThreadSynchronous([this]() {
+        xe::ui::ImGuiDialog::ShowMessageBox(
+            imgui_drawer_, "Uh-oh!",
           "The guest has crashed.\n\n"
           ""
           "Xenia has now paused itself.\n"
           "A crash dump has been written into the log.");
-    });
+      });
+    }
+  } else {
+    XELOGE("Additional crash detected - dialog already shown");
   }
 
   // Now suspend ourself (we should be a guest thread).
