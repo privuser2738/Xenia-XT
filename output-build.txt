@@ -1,0 +1,318 @@
+rm -rf ./bin
+rm -rf ./build
+rm -rf ./obj
+mkdir -p build/bootstrap
+cc -o build/bootstrap/premake_bootstrap -DPREMAKE_NO_BUILTIN_SCRIPTS -DLUA_USE_POSIX -DLUA_USE_DLOPEN -I"contrib/lua/src" -I"contrib/luashim" src/host/*.c contrib/lua/src/lapi.c contrib/lua/src/lbaselib.c contrib/lua/src/lbitlib.c contrib/lua/src/lcode.c contrib/lua/src/lcorolib.c contrib/lua/src/lctype.c contrib/lua/src/ldblib.c contrib/lua/src/ldebug.c contrib/lua/src/ldo.c contrib/lua/src/ldump.c contrib/lua/src/lfunc.c contrib/lua/src/lgc.c contrib/lua/src/linit.c contrib/lua/src/liolib.c contrib/lua/src/llex.c contrib/lua/src/lmathlib.c contrib/lua/src/lmem.c contrib/lua/src/loadlib.c contrib/lua/src/lobject.c contrib/lua/src/lopcodes.c contrib/lua/src/loslib.c contrib/lua/src/lparser.c contrib/lua/src/lstate.c contrib/lua/src/lstring.c contrib/lua/src/lstrlib.c contrib/lua/src/ltable.c contrib/lua/src/ltablib.c contrib/lua/src/ltm.c contrib/lua/src/lundump.c contrib/lua/src/lutf8lib.c contrib/lua/src/lvm.c contrib/lua/src/lzio.c  -lm -ldl -lrt
+./build/bootstrap/premake_bootstrap embed
+Running action 'embed'...
+Compiling... 
+Embedding...
+Writing...
+./build/bootstrap/premake_bootstrap --to=build/bootstrap gmake2
+Building configurations...
+Running action 'gmake2'...
+Generated build/bootstrap/Makefile...
+Generated build/bootstrap/Premake5.make...
+Generated build/bootstrap/lua-lib.make...
+Generated build/bootstrap/luashim-lib.make...
+Generated build/bootstrap/zlib-lib.make...
+Generated build/bootstrap/zip-lib.make...
+Generated build/bootstrap/mbedtls-lib.make...
+Generated build/bootstrap/curl-lib.make...
+Generated build/bootstrap/example.make...
+Generated build/bootstrap/luasocket.make...
+Done (997ms).
+make -C build/bootstrap -j`getconf _NPROCESSORS_ONLN` config=release
+make[1]: Entering directory '/home/aseio/source/003/xenia/third_party/premake-core/build/bootstrap'
+==== Building lua-lib (release) ====
+==== Building zip-lib (release) ====
+==== Building zlib-lib (release) ====
+==== Building mbedtls-lib (release) ====
+==== Building luashim-lib (release) ====
+==== Building curl-lib (release) ====
+Creating obj/Release/luashim-lib
+Creating bin/Release
+luashim.c
+Creating obj/Release/zlib-lib
+adler32.c
+compress.c
+crc32.c
+deflate.c
+gzclose.c
+gzlib.c
+gzread.c
+Creating obj/Release/lua-lib
+lapi.c
+Creating obj/Release/mbedtls-lib
+aes.c
+aesni.c
+Creating obj/Release/zip-lib
+Creating obj/Release/curl-lib
+mkstemp.c
+amigaos.c
+lbaselib.c
+asyn-ares.c
+arc4.c
+lbitlib.c
+gzwrite.c
+aria.c
+asyn-thread.c
+lcode.c
+axtls.c
+base64.c
+asn1parse.c
+infback.c
+Linking luashim-lib
+asn1write.c
+base64.c
+lcorolib.c
+lctype.c
+ldblib.c
+cleartext.c
+conncache.c
+inffast.c
+bignum.c
+connect.c
+ldebug.c
+ldo.c
+blowfish.c
+camellia.c
+ccm.c
+certs.c
+content_encoding.c
+chacha20.c
+inflate.c
+inftrees.c
+trees.c
+cookie.c
+uncompr.c
+chachapoly.c
+zutil.c
+cipher.c
+cram.c
+cipher_wrap.c
+ldump.c
+lfunc.c
+curl_addrinfo.c
+curl_des.c
+cmac.c
+curl_endian.c
+curl_fnmatch.c
+lgc.c
+curl_gethostname.c
+ctr_drbg.c
+curl_gssapi.c
+linit.c
+curl_memrchr.c
+debug.c
+curl_multibyte.c
+liolib.c
+curl_ntlm_core.c
+curl_ntlm_wb.c
+des.c
+curl_rtmp.c
+llex.c
+curl_sasl.c
+dhm.c
+curl_sspi.c
+curl_threads.c
+cyassl.c
+lmathlib.c
+lmem.c
+darwinssl.c
+loadlib.c
+dict.c
+ecdh.c
+lobject.c
+digest.c
+lopcodes.c
+ecdsa.c
+ecjpake.c
+digest_sspi.c
+dotdot.c
+ecp.c
+loslib.c
+easy.c
+ecp_curves.c
+Linking zlib-lib
+escape.c
+lparser.c
+lstate.c
+entropy.c
+file.c
+fileinfo.c
+lstring.c
+formdata.c
+entropy_poll.c
+ftp.c
+lstrlib.c
+error.c
+ltable.c
+ltablib.c
+ftplistparser.c
+gcm.c
+havege.c
+ltm.c
+lundump.c
+hkdf.c
+lutf8lib.c
+getenv.c
+getinfo.c
+lvm.c
+hmac_drbg.c
+gopher.c
+lzio.c
+md.c
+gskit.c
+md2.c
+gtls.c
+md4.c
+md5.c
+memory_buffer_alloc.c
+net_sockets.c
+hash.c
+hmac.c
+nist_kw.c
+oid.c
+padlock.c
+hostasyn.c
+hostcheck.c
+hostip.c
+pem.c
+hostip4.c
+pk.c
+hostip6.c
+pk_wrap.c
+pkcs11.c
+hostsyn.c
+pkcs12.c
+http.c
+http2.c
+pkcs5.c
+pkparse.c
+http_chunks.c
+pkwrite.c
+http_digest.c
+platform.c
+http_negotiate.c
+http_ntlm.c
+platform_util.c
+http_proxy.c
+idn_win32.c
+poly1305.c
+psa_crypto.c
+psa_crypto_driver_wrappers.c
+if2ip.c
+imap.c
+inet_ntop.c
+psa_crypto_se.c
+psa_crypto_slot_management.c
+inet_pton.c
+psa_crypto_storage.c
+psa_its_file.c
+krb5.c
+ripemd160.c
+krb5_gssapi.c
+rsa.c
+krb5_sspi.c
+ldap.c
+llist.c
+sha1.c
+rsa_internal.c
+sha256.c
+sha512.c
+mbedtls.c
+ssl_cache.c
+Linking lua-lib
+ssl_ciphersuites.c
+md4.c
+md5.c
+memdebug.c
+ssl_cli.c
+ssl_cookie.c
+mprintf.c
+ssl_msg.c
+multi.c
+ssl_srv.c
+netrc.c
+non-ascii.c
+ssl_ticket.c
+nonblock.c
+ssl_tls.c
+nss.c
+ssl_tls13_keys.c
+ntlm.c
+threading.c
+ntlm_sspi.c
+timing.c
+nwlib.c
+nwos.c
+version.c
+version_features.c
+x509.c
+x509_create.c
+oauth2.c
+openldap.c
+openssl.c
+parsedate.c
+x509_crl.c
+x509_crt.c
+pingpong.c
+pipeline.c
+x509_csr.c
+x509write_crt.c
+polarssl.c
+x509write_csr.c
+xtea.c
+polarssl_threadlock.c
+pop3.c
+progress.c
+rand.c
+rtsp.c
+schannel.c
+security.c
+select.c
+sendf.c
+share.c
+slist.c
+smb.c
+smtp.c
+socks.c
+socks_gssapi.c
+socks_sspi.c
+speedcheck.c
+splay.c
+spnego_gssapi.c
+spnego_sspi.c
+ssh.c
+strcase.c
+strdup.c
+strerror.c
+strtok.c
+strtoofft.c
+system_win32.c
+telnet.c
+tftp.c
+timeval.c
+transfer.c
+url.c
+vauth.c
+version.c
+vtls.c
+warnless.c
+wildcard.c
+x509asn1.c
+Linking mbedtls-lib
+Linking curl-lib
+make[1]: Leaving directory '/home/aseio/source/003/xenia/third_party/premake-core/build/bootstrap'
+premake5 executable not found, attempting build...
+ERROR: cannot build premake5 executable.
+make: Entering directory '/home/aseio/source/003/xenia'
+make: Leaving directory '/home/aseio/source/003/xenia'
+Building debug...
+
+- running premake...
+
+- building (all):debug...
+
+ERROR: build failed with one or more errors.

@@ -101,7 +101,10 @@
       "Bash(./xb.bat clean)",
       "Bash(./xb.bat premake)",
       "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/VsDevCmd.bat\" -arch=amd64 -host_arch=amd64)",
-      "Bash(set)"
+      "Bash(set)",
+      "Bash(make:*)",
+      "Bash(./build-linux.sh:*)",
+      "Bash(./xb build:*)"
     ],
     "deny": [],
     "ask": []

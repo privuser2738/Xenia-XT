@@ -7,6 +7,12 @@
  ******************************************************************************
  */
 
+// Suppress warning about memset on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include "xenia/base/cvar.h"
 #include "xenia/base/logging.h"
 #include "xenia/base/math.h"
@@ -110,3 +116,7 @@ void TextureDump(const TextureInfo& src, void* buffer, size_t length) {
 
 }  // namespace gpu
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

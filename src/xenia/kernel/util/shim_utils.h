@@ -24,6 +24,12 @@
 #include "xenia/kernel/kernel_flags.h"
 #include "xenia/kernel/kernel_state.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 namespace xe {
 namespace kernel {
 
@@ -619,5 +625,9 @@ using xe::cpu::ExportTag;
 
 }  // namespace kernel
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif  // XENIA_KERNEL_UTIL_SHIM_UTILS_H_

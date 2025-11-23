@@ -9,6 +9,12 @@
 
 #include "xenia/gpu/command_processor.h"
 
+// Suppress warning about memset on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include <algorithm>
 #include <cinttypes>
 #include <cmath>
@@ -1646,3 +1652,7 @@ void CommandProcessor::InitializeTrace() {
 
 }  // namespace gpu
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

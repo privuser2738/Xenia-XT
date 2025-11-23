@@ -25,6 +25,13 @@
 #include "xenia/gpu/texture_util.h"
 #include "xenia/gpu/xenos.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+// (intentional for bitfield structures)
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 namespace xe {
 namespace gpu {
 
@@ -640,5 +647,9 @@ class TextureCache {
 
 }  // namespace gpu
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif  // XENIA_GPU_TEXTURE_CACHE_H_

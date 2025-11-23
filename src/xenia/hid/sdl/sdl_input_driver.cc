@@ -9,6 +9,12 @@
 
 #include "xenia/hid/sdl/sdl_input_driver.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include <array>
 
 #if XE_PLATFORM_WIN32
@@ -756,3 +762,7 @@ inline uint64_t SDLInputDriver::AnalogToKeyfield(
 }  // namespace sdl
 }  // namespace hid
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

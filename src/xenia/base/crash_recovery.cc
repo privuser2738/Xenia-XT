@@ -14,12 +14,13 @@
 #include <fstream>
 #include <sstream>
 
+#include <signal.h>
+
 #include "third_party/fmt/include/fmt/format.h"
 #include "xenia/base/logging.h"
 
 #if XE_PLATFORM_WIN32
 #include <Windows.h>
-#include <signal.h>
 #endif
 
 namespace xe {
@@ -146,8 +147,9 @@ LONG WINAPI CrashExceptionHandler(EXCEPTION_POINTERS* ex_info) {
 
   return EXCEPTION_CONTINUE_SEARCH;
 }
+#endif  // XE_PLATFORM_WIN32
 
-// Signal handler for POSIX signals
+// Signal handler for POSIX signals (used on all platforms)
 void SignalHandler(int sig) {
   if (!g_crash_manager) {
     return;
@@ -181,7 +183,6 @@ void SignalHandler(int sig) {
   g_crash_manager->RecordCrash(crash);
   g_crash_manager->SaveLearningDatabase();
 }
-#endif
 
 }  // namespace
 

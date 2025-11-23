@@ -52,6 +52,25 @@ void Break() {
   std::raise(SIGTRAP);
 }
 
+// Returns: 0 = Abort, 1 = Retry (break), 2 = Ignore
+int ShowAssertionDialog(const char* message, const char* file, int line) {
+  // On POSIX, just print the assertion and return ignore to continue execution.
+  // A full GUI dialog would require platform-specific toolkit support.
+  std::cerr << "Assertion Failed!" << std::endl;
+  std::cerr << "File: " << file << std::endl;
+  std::cerr << "Line: " << line << std::endl;
+  std::cerr << "Expression: " << message << std::endl;
+  std::cerr << std::endl;
+
+  // If a debugger is attached, return 1 (retry/break)
+  if (IsDebuggerAttached()) {
+    return 1;  // Break into debugger
+  }
+
+  // Otherwise, return 2 (ignore) to continue execution
+  return 2;
+}
+
 namespace internal {
 void DebugPrint(const char* s) { std::clog << s << std::endl; }
 }  // namespace internal
