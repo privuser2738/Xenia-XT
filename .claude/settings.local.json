@@ -104,7 +104,8 @@
       "Bash(set)",
       "Bash(make:*)",
       "Bash(./build-linux.sh:*)",
-      "Bash(./xb build:*)"
+      "Bash(./xb build:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

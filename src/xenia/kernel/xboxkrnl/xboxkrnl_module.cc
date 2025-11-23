@@ -9,6 +9,12 @@
 
 #include "xenia/kernel/xboxkrnl/xboxkrnl_module.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include <vector>
 
 #include "third_party/fmt/include/fmt/format.h"
@@ -273,3 +279,7 @@ XboxkrnlModule::~XboxkrnlModule() = default;
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

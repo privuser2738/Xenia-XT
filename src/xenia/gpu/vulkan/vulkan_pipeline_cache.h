@@ -29,6 +29,12 @@
 #include "xenia/gpu/xenos.h"
 #include "xenia/ui/vulkan/vulkan_api.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 namespace xe {
 namespace gpu {
 namespace vulkan {
@@ -329,5 +335,9 @@ class VulkanPipelineCache {
 }  // namespace vulkan
 }  // namespace gpu
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif  // XENIA_GPU_VULKAN_VULKAN_PIPELINE_STATE_CACHE_H_

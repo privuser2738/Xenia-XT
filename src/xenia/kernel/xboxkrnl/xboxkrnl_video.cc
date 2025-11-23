@@ -9,6 +9,12 @@
 
 #include "xenia/kernel/xboxkrnl/xboxkrnl_video.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include "xenia/base/logging.h"
 #include "xenia/emulator.h"
 #include "xenia/gpu/graphics_system.h"
@@ -494,3 +500,7 @@ void RegisterVideoExports(xe::cpu::ExportResolver* export_resolver,
 }  // namespace xboxkrnl
 }  // namespace kernel
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

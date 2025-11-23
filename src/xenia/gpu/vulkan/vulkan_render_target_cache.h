@@ -26,6 +26,12 @@
 #include "xenia/ui/vulkan/single_layout_descriptor_set_pool.h"
 #include "xenia/ui/vulkan/vulkan_upload_buffer_pool.h"
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 namespace xe {
 namespace gpu {
 namespace vulkan {
@@ -931,5 +937,9 @@ class VulkanRenderTargetCache final : public RenderTargetCache {
 }  // namespace vulkan
 }  // namespace gpu
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 #endif  // XENIA_GPU_VULKAN_VULKAN_RENDER_TARGET_CACHE_H_

@@ -119,8 +119,8 @@ dword_result_t NtAllocateVirtualMemory_entry(lpdword_t base_addr_ptr,
   uint32_t adjusted_base = *base_addr_ptr - (*base_addr_ptr % page_size);
   // For some reason, some games pass in negative sizes.
   uint32_t adjusted_size = int32_t(*region_size_ptr) < 0
-                               ? -int32_t(*region_size_ptr)
-                               : *region_size_ptr;
+                               ? static_cast<uint32_t>(-int32_t(*region_size_ptr))
+                               : static_cast<uint32_t>(*region_size_ptr);
   adjusted_size = xe::round_up(adjusted_size, page_size);
 
   // Allocate.

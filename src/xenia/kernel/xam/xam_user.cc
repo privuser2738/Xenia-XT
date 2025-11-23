@@ -7,6 +7,12 @@
  ******************************************************************************
  */
 
+// Suppress warning about memset/memcpy on non-trivially copyable types
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnontrivial-memcall"
+#endif
+
 #include <cstring>
 
 #include "xenia/base/logging.h"
@@ -766,5 +772,9 @@ DECLARE_XAM_EXPORT1(XamSessionRefObjByHandle, kUserProfiles, kStub);
 }  // namespace xam
 }  // namespace kernel
 }  // namespace xe
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
 
 DECLARE_XAM_EMPTY_REGISTER_EXPORTS(User);
