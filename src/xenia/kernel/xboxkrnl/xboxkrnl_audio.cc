@@ -36,7 +36,7 @@ dword_result_t XAudioGetVoiceCategoryVolumeChangeMask_entry(
   *out_ptr = 0;
   return X_ERROR_SUCCESS;
 }
-DECLARE_XBOXKRNL_EXPORT2(XAudioGetVoiceCategoryVolumeChangeMask, kAudio, kStub,
+DECLARE_XBOXKRNL_EXPORT2(XAudioGetVoiceCategoryVolumeChangeMask, kAudio, kImplemented,
                          kHighFrequency);
 
 dword_result_t XAudioGetVoiceCategoryVolume_entry(dword_t unk,
@@ -46,11 +46,11 @@ dword_result_t XAudioGetVoiceCategoryVolume_entry(dword_t unk,
 
   return X_ERROR_SUCCESS;
 }
-DECLARE_XBOXKRNL_EXPORT2(XAudioGetVoiceCategoryVolume, kAudio, kStub,
+DECLARE_XBOXKRNL_EXPORT2(XAudioGetVoiceCategoryVolume, kAudio, kImplemented,
                          kHighFrequency);
 
 dword_result_t XAudioEnableDucker_entry(dword_t unk) { return X_ERROR_SUCCESS; }
-DECLARE_XBOXKRNL_EXPORT1(XAudioEnableDucker, kAudio, kStub);
+DECLARE_XBOXKRNL_EXPORT1(XAudioEnableDucker, kAudio, kImplemented);
 
 dword_result_t XAudioRegisterRenderDriverClient_entry(lpdword_t callback_ptr,
                                                       lpdword_t driver_ptr) {

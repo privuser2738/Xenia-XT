@@ -20,16 +20,37 @@ namespace xboxkrnl {
 void HalReturnToFirmware_entry(dword_t routine) {
   // void
   // IN FIRMWARE_REENTRY  Routine
-
-  // Routine must be 1 'HalRebootRoutine'
-  assert_true(routine == 1);
-
-  // TODO(benvank): diediedie much more gracefully
-  // Not sure how to blast back up the stack in LLVM without exceptions, though.
-  XELOGE("Game requested shutdown via HalReturnToFirmware");
-  exit(0);
+  //
+  // Routine values:
+  // 0 = HalHaltRoutine - halt the system
+  // 1 = HalRebootRoutine - reboot  
+  // 2 = HalKdRebootRoutine - reboot into kernel debugger
+  // 3 = HalFatalErrorRebootRoutine - reboot due to fatal error
+  // 4 = HalPowerDownRoutine - power off
+  // 5 = HalRebootQuiesceRoutine - quiet reboot
+  // 6 = HalForceShutdownRoutine - force shutdown
+  
+  XELOGI("HalReturnToFirmware called with routine {}", (uint32_t)routine);
+  
+  switch (routine) {
+    case 0:  // HalHaltRoutine
+      XELOGI("Game requested halt");
+      break;
+    case 1:  // HalRebootRoutine  
+      XELOGI("Game requested reboot/exit");
+      break;
+    case 4:  // HalPowerDownRoutine
+      XELOGI("Game requested power down");
+      break;
+    default:
+      XELOGI("Game requested firmware return (routine {})", (uint32_t)routine);
+      break;
+  }
+  
+  // Request graceful termination through the kernel
+  kernel_state()->TerminateTitle();
 }
-DECLARE_XBOXKRNL_EXPORT2(HalReturnToFirmware, kNone, kStub, kImportant);
+DECLARE_XBOXKRNL_EXPORT2(HalReturnToFirmware, kNone, kImplemented, kImportant);
 
 }  // namespace xboxkrnl
 }  // namespace kernel

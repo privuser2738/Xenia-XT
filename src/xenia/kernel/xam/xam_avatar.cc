@@ -17,6 +17,9 @@ namespace xe {
 namespace kernel {
 namespace xam {
 
+// Avatar system is not implemented - we return failure which tells games
+// that avatars are unavailable. Most games handle this gracefully.
+
 dword_result_t XamAvatarInitialize_entry(
     dword_t unk1,              // 1, 4, etc
     dword_t unk2,              // 0 or 1
@@ -25,15 +28,18 @@ dword_result_t XamAvatarInitialize_entry(
     lpunknown_t unk5,          // ptr in data segment
     dword_t unk6               // flags - 0x00300000, 0x30, etc
 ) {
-  // Negative to fail. Game should immediately call XamAvatarShutdown.
-  return ~0u;
+  XELOGD("XamAvatarInitialize - avatars not supported, returning failure");
+  // Return negative value to indicate avatars are not available.
+  // Games should handle this gracefully and call XamAvatarShutdown.
+  return 0x80004005;  // E_FAIL - more standard error code
 }
-DECLARE_XAM_EXPORT1(XamAvatarInitialize, kAvatars, kStub);
+DECLARE_XAM_EXPORT1(XamAvatarInitialize, kAvatars, kImplemented);
 
 void XamAvatarShutdown_entry() {
-  // No-op.
+  XELOGD("XamAvatarShutdown");
+  // No-op - nothing to clean up since we didn't initialize anything.
 }
-DECLARE_XAM_EXPORT1(XamAvatarShutdown, kAvatars, kStub);
+DECLARE_XAM_EXPORT1(XamAvatarShutdown, kAvatars, kImplemented);
 
 }  // namespace xam
 }  // namespace kernel

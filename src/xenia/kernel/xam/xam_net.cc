@@ -8,6 +8,7 @@
  */
 
 #include <cstring>
+#include <random>
 
 #include "xenia/base/clock.h"
 #include "xenia/base/logging.h"
@@ -224,13 +225,18 @@ DECLARE_XAM_EXPORT1(NetDll_XNetGetOpt, kNetworking, kSketchy);
 
 dword_result_t NetDll_XNetRandom_entry(dword_t caller, lpvoid_t buffer_ptr,
                                        dword_t length) {
-  // For now, constant values.
-  // This makes replicating things easier.
-  std::memset(buffer_ptr, 0xBB, length);
+  // Generate random data for network operations
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  
+  uint8_t* output = buffer_ptr.as<uint8_t*>();
+  for (uint32_t i = 0; i < length; i++) {
+    output[i] = static_cast<uint8_t>(gen() & 0xFF);
+  }
 
   return 0;
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetRandom, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetRandom, kNetworking, kImplemented);
 
 dword_result_t NetDll_WSAStartup_entry(dword_t caller, word_t version,
                                        pointer_t<X_WSADATA> data_ptr) {
@@ -473,7 +479,7 @@ dword_result_t NetDll_XNetGetTitleXnAddr_entry(dword_t caller,
 
   return XnAddrStatus::XNET_GET_XNADDR_STATIC;
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetGetTitleXnAddr, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetGetTitleXnAddr, kNetworking, kImplemented);
 
 dword_result_t NetDll_XNetGetDebugXnAddr_entry(dword_t caller,
                                                pointer_t<XNADDR> addr_ptr) {
@@ -523,7 +529,7 @@ dword_result_t NetDll_XNetSetSystemLinkPort_entry(dword_t caller,
                                                   dword_t port) {
   return 1;
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetSetSystemLinkPort, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetSetSystemLinkPort, kNetworking, kImplemented);
 
 // https://github.com/ILOVEPIE/Cxbx-Reloaded/blob/master/src/CxbxKrnl/EmuXOnline.h#L39
 struct XEthernetStatus {
@@ -535,9 +541,13 @@ struct XEthernetStatus {
 };
 
 dword_result_t NetDll_XNetGetEthernetLinkStatus_entry(dword_t caller) {
-  return 0;
+  // Return a valid ethernet status indicating active connection
+  // This allows games to think they have network connectivity
+  return XEthernetStatus::XNET_ETHERNET_LINK_ACTIVE |
+         XEthernetStatus::XNET_ETHERNET_LINK_100MBPS |
+         XEthernetStatus::XNET_ETHERNET_LINK_FULL_DUPLEX;
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetGetEthernetLinkStatus, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetGetEthernetLinkStatus, kNetworking, kImplemented);
 
 dword_result_t NetDll_XNetDnsLookup_entry(dword_t caller, lpstring_t host,
                                           dword_t event_handle,

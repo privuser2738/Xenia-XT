@@ -91,7 +91,8 @@
       "Bash(python3:*)",
       "WebFetch(domain:xenonlibrary.com)",
       "Bash(xxd:*)",
-      "Bash(md5sum:*)"
+      "Bash(md5sum:*)",
+      "Bash(tasklist:*)"
     ],
     "deny": [],
     "ask": []

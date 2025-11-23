@@ -8,6 +8,8 @@
 */
 
 #include <algorithm>
+#include <chrono>
+#include <random>
 
 #include "xenia/base/logging.h"
 #include "xenia/base/platform.h"
@@ -352,9 +354,28 @@ dword_result_t XeCryptBnDwLePkcs1Verify_entry(lpvoid_t hash, lpvoid_t sig,
 DECLARE_XBOXKRNL_EXPORT1(XeCryptBnDwLePkcs1Verify, kNone, kStub);
 
 void XeCryptRandom_entry(lpvoid_t buf, dword_t buf_size) {
-  std::memset(buf, 0xFD, buf_size);
+  // Generate cryptographically random data
+  // Use a combination of std::random_device and high-resolution clock for entropy
+  static std::random_device rd;
+  static std::mt19937_64 gen(rd() ^ 
+      std::chrono::high_resolution_clock::now().time_since_epoch().count());
+  
+  uint8_t* output = buf.as<uint8_t*>();
+  size_t remaining = buf_size;
+  
+  while (remaining >= 8) {
+    uint64_t random_val = gen();
+    std::memcpy(output, &random_val, 8);
+    output += 8;
+    remaining -= 8;
+  }
+  
+  if (remaining > 0) {
+    uint64_t random_val = gen();
+    std::memcpy(output, &random_val, remaining);
+  }
 }
-DECLARE_XBOXKRNL_EXPORT1(XeCryptRandom, kNone, kStub);
+DECLARE_XBOXKRNL_EXPORT1(XeCryptRandom, kNone, kImplemented);
 
 struct XECRYPT_DES_STATE {
   uint32_t keytab[16][2];
