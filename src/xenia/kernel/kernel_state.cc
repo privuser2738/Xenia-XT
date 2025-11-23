@@ -556,7 +556,8 @@ void KernelState::TerminateTitle() {
              user_modules_[i]->name(), status);
     }
 
-    object_table_.RemoveHandle(user_modules_[i]->handle());
+    // Use ReleaseHandle instead of RemoveHandle to properly handle ref count
+    object_table_.ReleaseHandle(user_modules_[i]->handle());
   }
   user_modules_.clear();
 

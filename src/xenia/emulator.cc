@@ -464,6 +464,55 @@ X_STATUS Emulator::LaunchFolder(const std::filesystem::path& path) {
     return X_STATUS_INVALID_PARAMETER;
   }
 
+  // First, check if the folder contains an ISO file - if so, launch the ISO directly
+  // This handles the case where users select a folder containing a disc image
+  try {
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+      if (entry.is_regular_file()) {
+        auto ext = xe::utf8::lower_ascii(xe::path_to_utf8(entry.path().extension()));
+        if (ext == ".iso") {
+          // Get absolute path for reliability
+          auto abs_iso = std::filesystem::absolute(entry.path());
+          XELOGI("LaunchFolder: Found ISO file in folder: {}", xe::path_to_utf8(abs_iso));
+          XELOGI("LaunchFolder: Redirecting to LaunchDiscImage...");
+          return LaunchDiscImage(abs_iso);
+        }
+      }
+    }
+  } catch (const std::filesystem::filesystem_error& e) {
+    XELOGE("LaunchFolder: Filesystem error scanning folder: {}", e.what());
+    // Continue to try mounting folder directly
+  } catch (const std::exception& e) {
+    XELOGE("LaunchFolder: Error scanning folder for ISO: {}", e.what());
+    // Continue to try mounting folder directly
+  }
+
+  // Check if default.xex exists and is a valid XEX (not just a stub)
+  auto default_xex_path = path / "default.xex";
+  if (std::filesystem::exists(default_xex_path)) {
+    auto file_size = std::filesystem::file_size(default_xex_path);
+    // XEX files should be much larger than 64KB for real games
+    // A 16KB default.xex is typically a DVD video launcher stub
+    if (file_size < 65536) {
+      XELOGW("LaunchFolder: default.xex is only {} bytes - likely a DVD launcher stub",
+             file_size);
+      XELOGW("LaunchFolder: This folder may contain a raw disc extraction.");
+      XELOGW("LaunchFolder: For Xbox 360 games, you need to extract the XDVDFS/GDFX contents,");
+      XELOGW("LaunchFolder: not the raw DVD structure. Use a tool like 'extract-xiso' or similar.");
+      
+      // Check for VIDEO_TS folder which indicates raw DVD extraction
+      if (std::filesystem::exists(path / "VIDEO_TS")) {
+        xe::FatalError(
+            "This folder appears to be a raw DVD extraction, not an extracted Xbox 360 game.\n\n"
+            "Xbox 360 games use XDVDFS/GDFX filesystem inside the ISO.\n"
+            "Please either:\n"
+            "1. Use the ISO file directly (File -> Open)\n"
+            "2. Extract the game properly using extract-xiso or similar tool");
+        return X_STATUS_INVALID_PARAMETER;
+      }
+    }
+  }
+
   // Mount the folder as a disc-like device (similar to extracted ISO)
   auto mount_path = "\\Device\\Cdrom0";
 

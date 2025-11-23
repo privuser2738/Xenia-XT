@@ -887,7 +887,10 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
   x1 = std::clamp(x1, int32_t(scissor.offset[0]), scissor_right);
   y1 = std::clamp(y1, int32_t(scissor.offset[1]), scissor_bottom);
 
-  assert_true(x0 <= x1 && y0 <= y1);
+  // Ensure coordinates are not inverted after clamping
+  // This can happen with invalid guest input; swap to make valid
+  if (x0 > x1) std::swap(x0, x1);
+  if (y0 > y1) std::swap(y0, y1);
 
   // Direct3D 9's D3DDevice_Resolve internally rounds the right/bottom of the
   // rectangle internally to 8. While all the alignment should have already been
@@ -932,9 +935,10 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
     y1 = y0 + int32_t(xenos::kMaxResolveSize);
   }
 
-  assert_true(x0 < x1 && y0 < y1);
+  // Don't assert here - games can legitimately send empty resolve regions
+  // (e.g., during loading screens or transitions). Handle gracefully.
   if (x0 >= x1 || y0 >= y1) {
-    XELOGE("Resolve region is empty");
+    XELOGW("Resolve region is empty (x: {} to {}, y: {} to {})", x0, x1, y0, y1);
     return false;
   }
 

@@ -21,6 +21,7 @@ IF "%COMMAND%"=="" (
     ECHO   premake     - Run premake to update projects
     ECHO   devenv      - Launch Visual Studio
     ECHO   clean       - Clean build artifacts
+    ECHO   dist        - Build Release and package to dist folder
     ECHO.
     EXIT /B 1
 )
@@ -37,6 +38,7 @@ IF /I "%COMMAND%"=="premake" GOTO :cmd_premake
 IF /I "%COMMAND%"=="devenv" GOTO :cmd_devenv
 IF /I "%COMMAND%"=="clean" GOTO :cmd_clean
 IF /I "%COMMAND%"=="pull" GOTO :cmd_pull
+IF /I "%COMMAND%"=="dist" GOTO :cmd_dist
 
 ECHO ERROR: Unknown command "%COMMAND%"
 EXIT /B 1
@@ -503,3 +505,81 @@ IF EXIST "!VCVARSALL!" (
 
 ECHO ERROR: Could not find VsDevCmd.bat or vcvarsall.bat in VS installation
 EXIT /B 1
+
+REM ============================================================================
+REM Dist Command - Build Release and Package
+REM ============================================================================
+:cmd_dist
+ECHO Creating distribution package...
+ECHO.
+
+REM Build Release first
+ECHO - building Release configuration...
+CALL :cmd_build_internal Release
+IF ERRORLEVEL 1 (
+    ECHO ERROR: Release build failed.
+    EXIT /B 1
+)
+ECHO.
+
+REM Create dist directory
+SET "DIST_DIR=%ROOT_DIR%dist"
+IF EXIST "%DIST_DIR%" (
+    ECHO - cleaning existing dist folder...
+    RMDIR /S /Q "%DIST_DIR%"
+)
+MKDIR "%DIST_DIR%"
+
+REM Copy main executables
+ECHO - copying executables...
+SET "BIN_DIR=%ROOT_DIR%build\bin\Windows\Release"
+
+IF EXIST "%BIN_DIR%\xenia.exe" (
+    COPY "%BIN_DIR%\xenia.exe" "%DIST_DIR%\" >nul
+    ECHO   + xenia.exe
+)
+IF EXIST "%BIN_DIR%\xenia-vfs-dump.exe" (
+    COPY "%BIN_DIR%\xenia-vfs-dump.exe" "%DIST_DIR%\" >nul
+    ECHO   + xenia-vfs-dump.exe
+)
+IF EXIST "%BIN_DIR%\xenia-gpu-shader-compiler.exe" (
+    COPY "%BIN_DIR%\xenia-gpu-shader-compiler.exe" "%DIST_DIR%\" >nul
+    ECHO   + xenia-gpu-shader-compiler.exe
+)
+
+REM Copy any DLLs that might be needed
+ECHO - copying any required DLLs...
+FOR %%F IN ("%BIN_DIR%\*.dll") DO (
+    COPY "%%F" "%DIST_DIR%\" >nul
+    ECHO   + %%~nxF
+)
+
+REM Copy license
+IF EXIST "%ROOT_DIR%LICENSE" (
+    COPY "%ROOT_DIR%LICENSE" "%DIST_DIR%\" >nul
+    ECHO   + LICENSE
+)
+
+ECHO.
+ECHO Distribution package created at: %DIST_DIR%
+ECHO.
+DIR "%DIST_DIR%"
+ECHO.
+ECHO Success!
+EXIT /B 0
+
+:cmd_build_internal
+SET "INT_CONFIG=%~1"
+IF "%INT_CONFIG%"=="" SET "INT_CONFIG=Release"
+
+REM Run premake
+CALL :run_premake vs2022
+IF ERRORLEVEL 1 EXIT /B 1
+
+REM Find msbuild
+CALL :find_msbuild
+IF ERRORLEVEL 1 EXIT /B 1
+
+REM Build
+"%MSBUILD%" build\xenia.sln /nologo /m /v:m /p:Configuration=%INT_CONFIG% /p:Platform=Windows
+EXIT /B %ERRORLEVEL%
