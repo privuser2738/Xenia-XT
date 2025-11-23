@@ -37,8 +37,22 @@ if sys.platform == 'linux':
 
 
 def import_subprocess_environment(args):
+    # Convert list to command string for shell execution (Python 3.13+ compatibility)
+    # Note: We manually build the command string because list2cmdline can mangle
+    # paths containing escape sequences like \1, \2, etc.
+    if isinstance(args, list):
+        # Quote arguments that contain spaces, join with spaces
+        quoted_args = []
+        for arg in args:
+            if ' ' in arg or '"' in arg:
+                quoted_args.append('"' + arg.replace('"', '\\"') + '"')
+            else:
+                quoted_args.append(arg)
+        cmd = ' '.join(quoted_args)
+    else:
+        cmd = args
     popen = subprocess.Popen(
-        args, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
     variables, _ = popen.communicate()
     envvars_to_save = (
         'devenvdir',
@@ -50,7 +64,17 @@ def import_subprocess_environment(args):
         'systemroot',
         'temp',
         'tmp',
+        'vctargetspath',
+        'vctoolsinstalldir',
+        'vctoolsredistdir',
+        'vctoolsversion',
+        'visualstudioversion',
+        'vsinstalldir',
         'windowssdkdir',
+        'windowssdkversion',
+        'windowssdkverbin',
+        'windowssdkbinpath',
+        'ucrtversion',
         )
     for line in variables.splitlines():
         for envvar in envvars_to_save:
@@ -62,6 +86,8 @@ def import_subprocess_environment(args):
                 break
 
 
+vs_install_path = None  # Global to store VS install path for build commands
+
 def import_vs_environment():
     """Finds the installed Visual Studio version and imports
     interesting environment variables into os.environ.
@@ -69,6 +95,7 @@ def import_vs_environment():
     Returns:
       A version such as 2015 or None if no installation is found.
     """
+    global vs_install_path
 
     if sys.platform != 'win32':
         return None
@@ -77,12 +104,21 @@ def import_vs_environment():
     install_path = None
     env_tool_args = None
 
+    vswhere_path = os.path.join(self_path, 'tools', 'vswhere', 'vswhere.exe')
     vswhere = subprocess.check_output(
-        'tools/vswhere/vswhere.exe -version "[15,)" -latest -prerelease -format json -utf8 -products '
-        "Microsoft.VisualStudio.Product.Enterprise "
-        "Microsoft.VisualStudio.Product.Professional "
-        "Microsoft.VisualStudio.Product.Community "
-        "Microsoft.VisualStudio.Product.BuildTools",
+        [
+            vswhere_path,
+            '-version', '[15,)',
+            '-latest',
+            '-prerelease',
+            '-format', 'json',
+            '-utf8',
+            '-products',
+            'Microsoft.VisualStudio.Product.Enterprise',
+            'Microsoft.VisualStudio.Product.Professional',
+            'Microsoft.VisualStudio.Product.Community',
+            'Microsoft.VisualStudio.Product.BuildTools',
+        ],
         shell=False,
         universal_newlines=True,
         encoding="utf-8",
@@ -100,17 +136,79 @@ def import_vs_environment():
             vcvars_path = os.path.join(vcvars_path, '..\\..\\vc\\vcvarsall.bat')
             env_tool_args = [vcvars_path, 'x64', '&&', 'set']
     else:
-        vsdevcmd_path = os.path.join(install_path, 'Common7\\Tools\\VsDevCmd.bat')
-        if os.path.isfile(vsdevcmd_path) and os.access(vsdevcmd_path, os.X_OK):
+        vsdevcmd_path = os.path.join(install_path, 'Common7', 'Tools', 'VsDevCmd.bat')
+        if os.path.isfile(vsdevcmd_path):
             env_tool_args = [vsdevcmd_path, '-arch=amd64', '-host_arch=amd64', '&&', 'set']
         else:
-            vcvars_path = os.path.join(install_path, 'VC\\Auxiliary\\Build\\vcvarsall.bat')
-            env_tool_args = [vcvars_path, 'x64', '&&', 'set']
+            vcvars_path = os.path.join(install_path, 'VC', 'Auxiliary', 'Build', 'vcvarsall.bat')
+            if os.path.isfile(vcvars_path):
+                env_tool_args = [vcvars_path, 'x64', '&&', 'set']
 
     if version == 0:
         return None
 
-    import_subprocess_environment(env_tool_args)
+    if env_tool_args:
+        import_subprocess_environment(env_tool_args)
+
+    # Explicitly set VS environment variables based on VS installation
+    # This fixes issues with corrupted user environment or missing env vars
+    if install_path:
+        # Set VCTargetsPath
+        vc_targets_candidates = [
+            os.path.join(install_path, 'MSBuild', 'Microsoft', 'VC', 'v170'),  # VS 2022/2026
+            os.path.join(install_path, 'MSBuild', 'Microsoft', 'VC', 'v160'),  # VS 2019
+            os.path.join(install_path, 'MSBuild', 'Microsoft', 'VC', 'v150'),  # VS 2017
+        ]
+        for vc_path in vc_targets_candidates:
+            if os.path.isdir(vc_path):
+                os.environ['VCTargetsPath'] = vc_path + '\\\\'
+                break
+
+        # Set VCToolsInstallDir - find the MSVC tools directory
+        # This is required when running msbuild from subprocess as environment isn't inherited
+        vc_tools_base = os.path.join(install_path, 'VC', 'Tools', 'MSVC')
+        if os.path.isdir(vc_tools_base):
+            # Find versions matching v143 toolset (14.3x or 14.4x versions)
+            # The projects use v143 PlatformToolset, so we need a compatible version
+            tool_versions = [d for d in os.listdir(vc_tools_base)
+                           if os.path.isdir(os.path.join(vc_tools_base, d))]
+            if tool_versions:
+                tool_versions.sort()
+                # Prefer v143-compatible versions (14.3x, 14.4x) over v145 (14.5x)
+                # This is because project files typically use v143 PlatformToolset
+                v143_versions = [v for v in tool_versions if v.startswith('14.3') or v.startswith('14.4')]
+                if v143_versions:
+                    selected_version = v143_versions[-1]  # Latest v143-compatible
+                else:
+                    selected_version = tool_versions[-1]  # Fallback to latest
+                vc_tools_path = os.path.join(vc_tools_base, selected_version)
+                os.environ['VCToolsInstallDir'] = vc_tools_path + '\\'
+                # Don't set VCToolsVersion - MSBuild will auto-detect from VCToolsInstallDir
+                # Also add the MSVC bin to PATH so CL.exe can be found
+                msvc_bin_path = os.path.join(vc_tools_path, 'bin', 'Hostx64', 'x64')
+                if os.path.isdir(msvc_bin_path):
+                    os.environ['PATH'] = msvc_bin_path + os.pathsep + os.environ.get('PATH', '')
+                # Add MSVC include path so vcruntime.h can be found
+                msvc_include_path = os.path.join(vc_tools_path, 'include')
+                if os.path.isdir(msvc_include_path):
+                    current_include = os.environ.get('INCLUDE', '')
+                    if current_include:
+                        os.environ['INCLUDE'] = msvc_include_path + os.pathsep + current_include
+                    else:
+                        os.environ['INCLUDE'] = msvc_include_path
+                # Add MSVC lib path
+                msvc_lib_path = os.path.join(vc_tools_path, 'lib', 'x64')
+                if os.path.isdir(msvc_lib_path):
+                    current_lib = os.environ.get('LIB', '')
+                    if current_lib:
+                        os.environ['LIB'] = msvc_lib_path + os.pathsep + current_lib
+                    else:
+                        os.environ['LIB'] = msvc_lib_path
+
+        # Set VSInstallDir
+        os.environ['VSINSTALLDIR'] = install_path + '\\'
+        vs_install_path = install_path
+
     os.environ['VSVERSION'] = str(version)
     return version
 
@@ -266,6 +364,10 @@ def generate_version_h():
     """Generates a build/version.h file that contains current git info.
     """
     header_file = 'build/version.h'
+    # Create build directory if it doesn't exist
+    build_dir = os.path.dirname(header_file)
+    if build_dir and not os.path.exists(build_dir):
+        os.makedirs(build_dir)
     pr_number = 0
     pr_repo_name = ""
     pr_branch_name = ""
@@ -507,6 +609,32 @@ def run_premake(target_os, action, cc=None):
     return ret
 
 
+def get_premake_vs_action(vs_version_str):
+    """Maps Visual Studio internal version number to premake action name.
+
+    Args:
+        vs_version_str: Version string like '2022', '2019', '18', '17', etc.
+
+    Returns:
+        Premake action name like 'vs2022'.
+    """
+    # Map internal version numbers to years
+    version_map = {
+        '14': '2015',
+        '2015': '2015',
+        '15': '2017',
+        '2017': '2017',
+        '16': '2019',
+        '2019': '2019',
+        '17': '2022',
+        '2022': '2022',
+        '18': '2022',  # VS 2026 uses v18, but premake doesn't support it yet
+        '2026': '2022',  # Fall back to vs2022 for VS 2026
+    }
+    year = version_map.get(vs_version_str, '2022')  # Default to vs2022
+    return 'vs' + year
+
+
 def run_platform_premake(target_os_override=None, cc='clang', devenv=None):
     """Runs all gyp configurations.
     """
@@ -518,7 +646,7 @@ def run_platform_premake(target_os_override=None, cc='clang', devenv=None):
             vs_version = '2015'
             if 'VSVERSION' in os.environ:
                 vs_version = os.environ['VSVERSION']
-            devenv = 'vs' + vs_version
+            devenv = get_premake_vs_action(vs_version)
         elif target_os == 'android':
             devenv = 'androidndk'
         else:
@@ -817,15 +945,28 @@ class BaseBuildCommand(Command):
                 else:
                     targets = '/t:Rebuild' if args['force'] else None
 
-                result = subprocess.call([
+                # Build msbuild command
+                msbuild_args = [
                     'msbuild',
                     'build/xenia.sln',
                     '/nologo',
                     '/m',
                     '/v:m',
                     '/p:Configuration=' + args['config'],
-                    ] + ([targets] if targets is not None else []) + pass_args,
-                    shell=False)
+                ] + ([targets] if targets is not None else []) + pass_args
+                msbuild_cmd = ' '.join(msbuild_args)
+
+                # Run msbuild through VsDevCmd.bat for proper VS environment
+                # This ensures all include paths, lib paths, and tools are correctly set
+                vsdevcmd_path = os.path.join(vs_install_path or os.environ.get('VSINSTALLDIR', '').rstrip('\\'),
+                                            'Common7', 'Tools', 'VsDevCmd.bat')
+                if vs_install_path and os.path.isfile(vsdevcmd_path):
+                    # Use VsDevCmd.bat to set up environment, then run msbuild
+                    full_cmd = f'"{vsdevcmd_path}" -arch=amd64 -host_arch=amd64 >nul 2>&1 && {msbuild_cmd}'
+                    result = subprocess.call(full_cmd, shell=True)
+                else:
+                    # Fallback to direct msbuild (may fail with environment issues)
+                    result = subprocess.call(msbuild_args, shell=False)
         elif sys.platform == 'darwin':
             schemes = args['target'] if len(args['target']) else ['xenia-app']
             nested_args = [['-scheme', scheme] for scheme in schemes]

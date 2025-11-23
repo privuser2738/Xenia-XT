@@ -92,7 +92,16 @@
       "WebFetch(domain:xenonlibrary.com)",
       "Bash(xxd:*)",
       "Bash(md5sum:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(./xb.bat)",
+      "Bash(python xenia-build:*)",
+      "Bash(python:*)",
+      "Bash(./xb.bat build:*)",
+      "Bash(./xb.bat --help)",
+      "Bash(./xb.bat clean)",
+      "Bash(./xb.bat premake)",
+      "Bash(\"C:/Program Files/Microsoft Visual Studio/18/Community/Common7/Tools/VsDevCmd.bat\" -arch=amd64 -host_arch=amd64)",
+      "Bash(set)"
     ],
     "deny": [],
     "ask": []

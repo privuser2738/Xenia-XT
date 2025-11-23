@@ -33,42 +33,41 @@ REM ============================================================================
 :check_python
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-SET FOUND_PATH=""
+SET "FOUND_PATH="
 
-SET "CANDIDATE_PATHS[0]=C:\python310\python.exe"
-SET "CANDIDATE_PATHS[1]=C:\python39\python.exe"
-SET "CANDIDATE_PATHS[2]=C:\python38\python.exe"
-SET "CANDIDATE_PATHS[3]=C:\python37\python.exe"
-SET "CANDIDATE_PATHS[4]=C:\python%PYTHON_MINIMUM_VERSION[0]%%PYTHON_MINIMUM_VERSION[1]%\python.exe"
-SET OUTPUT_INDEX=5
-
-FOR /F "usebackq delims=" %%L IN (`2^>NUL where python3`) DO (
-  IF %%~zL NEQ 0 (
-    SET "CANDIDATE_PATHS[!OUTPUT_INDEX!]=%%L"
-    SET /A OUTPUT_INDEX+=1
-  )
-)
-FOR /F "usebackq delims=" %%L IN (`2^>NUL where python`) DO (
-  IF %%~zL NEQ 0 (
-    SET "CANDIDATE_PATHS[!OUTPUT_INDEX!]=%%L"
-    SET /A OUTPUT_INDEX+=1
+REM Try to find Python from PATH first (most reliable for modern setups)
+FOR /F "usebackq tokens=*" %%L IN (`where python 2^>nul`) DO (
+  IF NOT DEFINED FOUND_PATH (
+    SET "FOUND_PATH=%%L"
   )
 )
 
-SET CANDIDATE_INDEX=0
-:check_candidate_loop
-IF NOT DEFINED CANDIDATE_PATHS[%CANDIDATE_INDEX%] (
-  GOTO :found_python
+REM If not found on PATH, check common installation directories
+IF NOT DEFINED FOUND_PATH (
+  FOR %%D IN (
+    "C:\python313\python.exe"
+    "C:\python312\python.exe"
+    "C:\python311\python.exe"
+    "C:\python310\python.exe"
+    "C:\python39\python.exe"
+    "C:\python38\python.exe"
+    "C:\python37\python.exe"
+    "C:\python36\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python311\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python310\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python39\python.exe"
+  ) DO (
+    IF NOT DEFINED FOUND_PATH (
+      IF EXIST %%D (
+        SET "FOUND_PATH=%%~D"
+      )
+    )
+  )
 )
-CALL SET CANDIDATE_PATH=%%CANDIDATE_PATHS[%CANDIDATE_INDEX%]%%
-IF NOT EXIST "%CANDIDATE_PATH%" (
-  SET /A CANDIDATE_INDEX+=1
-  GOTO :check_candidate_loop
-)
-SET "FOUND_PATH=%CANDIDATE_PATH%"
 
-:found_python
-IF "%FOUND_PATH%"=="" (
+IF NOT DEFINED FOUND_PATH (
   ECHO ERROR: no Python executable found on PATH.
   ECHO Make sure you can run 'python' or 'python3' in a Command Prompt.
   ENDLOCAL & SET _RESULT=1
