@@ -510,18 +510,64 @@ DECLARE_XAM_EXPORT1(NetDll_XNetInAddrToString, kNetworking, kStub);
 dword_result_t NetDll_XNetXnAddrToInAddr_entry(dword_t caller,
                                                pointer_t<XNADDR> xn_addr,
                                                lpvoid_t xid, lpvoid_t in_addr) {
-  return 1;
+  if (!xn_addr || !in_addr) {
+    XELOGW("NetDll_XNetXnAddrToInAddr: invalid parameters");
+    return 1;  // Error
+  }
+
+  // Copy the IP address from the XNADDR to the output IN_ADDR
+  auto* out_addr = reinterpret_cast<struct ::in_addr*>(in_addr.host_address());
+
+  // Use the online IP address if available, otherwise use the regular IP
+  if (xn_addr->inaOnline.s_addr != 0) {
+    *out_addr = xn_addr->inaOnline;
+  } else if (xn_addr->ina.s_addr != 0) {
+    *out_addr = xn_addr->ina;
+  } else {
+    // Generate a fake local IP based on the MAC address
+    out_addr->s_addr = htonl(0xC0A80100 |  // 192.168.1.x
+                             (xn_addr->abEnet[5] ? xn_addr->abEnet[5] : 1));
+  }
+
+  XELOGD("NetDll_XNetXnAddrToInAddr: converted to {:08X}",
+         ntohl(out_addr->s_addr));
+  return 0;  // Success
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetXnAddrToInAddr, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetXnAddrToInAddr, kNetworking, kImplemented);
 
 // Does the reverse of the above.
 // FIXME: Arguments may not be correct.
 dword_result_t NetDll_XNetInAddrToXnAddr_entry(dword_t caller, lpvoid_t in_addr,
                                                pointer_t<XNADDR> xn_addr,
                                                lpvoid_t xid) {
-  return 1;
+  if (!in_addr || !xn_addr) {
+    XELOGW("NetDll_XNetInAddrToXnAddr: invalid parameters");
+    return 1;  // Error
+  }
+
+  auto* src_addr = reinterpret_cast<struct ::in_addr*>(in_addr.host_address());
+
+  // Populate the XNADDR structure
+  xn_addr->ina = *src_addr;
+  xn_addr->inaOnline = *src_addr;
+  xn_addr->wPortOnline = 0;
+
+  // Generate a consistent MAC address from the IP
+  uint32_t ip = ntohl(src_addr->s_addr);
+  xn_addr->abEnet[0] = 0x00;
+  xn_addr->abEnet[1] = 0x22;
+  xn_addr->abEnet[2] = 0x48;  // Xbox 360 MAC prefix
+  xn_addr->abEnet[3] = (ip >> 16) & 0xFF;
+  xn_addr->abEnet[4] = (ip >> 8) & 0xFF;
+  xn_addr->abEnet[5] = ip & 0xFF;
+
+  // Clear online identification
+  std::memset(xn_addr->abOnline, 0, sizeof(xn_addr->abOnline));
+
+  XELOGD("NetDll_XNetInAddrToXnAddr: converted from {:08X}", ip);
+  return 0;  // Success
 }
-DECLARE_XAM_EXPORT1(NetDll_XNetInAddrToXnAddr, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_XNetInAddrToXnAddr, kNetworking, kImplemented);
 
 // https://www.google.com/patents/WO2008112448A1?cl=en
 // Reserves a port for use by system link
@@ -734,7 +780,7 @@ dword_result_t NetDll_getsockopt_entry(dword_t caller, dword_t socket_handle,
   }
   return 0;
 }
-DECLARE_XAM_EXPORT1(NetDll_getsockopt, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_getsockopt, kNetworking, kImplemented);
 
 dword_result_t NetDll_getsockname_entry(dword_t caller, dword_t socket_handle,
                                         pointer_t<XSOCKADDR_IN> addr_ptr,
@@ -759,7 +805,7 @@ dword_result_t NetDll_getsockname_entry(dword_t caller, dword_t socket_handle,
   }
   return 0;
 }
-DECLARE_XAM_EXPORT1(NetDll_getsockname, kNetworking, kStub);
+DECLARE_XAM_EXPORT1(NetDll_getsockname, kNetworking, kImplemented);
 
 dword_result_t NetDll_ioctlsocket_entry(dword_t caller, dword_t socket_handle,
                                         dword_t cmd, lpvoid_t arg_ptr) {

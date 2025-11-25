@@ -936,14 +936,11 @@ void EmulatorWindow::FileClose() {
 
   XELOGI("FileClose: Closing current game...");
 
-  // First pause to stop all threads safely
+  // Pause emulation first
   emulator_->Pause();
 
-  // Small delay to ensure threads are fully paused
-  xe::threading::Sleep(std::chrono::milliseconds(100));
-
-  // Now terminate the title
-  emulator_->TerminateTitle();
+  // Perform full cleanup including device unregistration and GPU cache clear
+  emulator_->CloseTitle();
 
   // Update window title to show no game loaded
   UpdateTitle();

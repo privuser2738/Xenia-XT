@@ -115,7 +115,13 @@
       "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xboxkrnl/*.cc)",
       "Bash(./build-windows.bat help)",
       "WebFetch(domain:archive.org)",
-      "Bash(git -C /c/Users/rob/source/001/xenia diff src/xenia/kernel/xam/xam_user.cc)"
+      "Bash(git -C /c/Users/rob/source/001/xenia diff src/xenia/kernel/xam/xam_user.cc)",
+      "Bash(if [ -f \"build/bin/Windows/Release/xenia-xt.exe\" ])",
+      "Bash(then stat -c \"%y\" \"build/bin/Windows/Release/xenia-xt.exe\")",
+      "Bash(else echo \"Build not complete yet\")",
+      "Bash(if [ -f c:/Users/rob/source/xenia/build/bin/Windows/Release/xenia.exe ])",
+      "Bash(then stat -c %y c:/Users/rob/source/xenia/build/bin/Windows/Release/xenia.exe)",
+      "Bash(else echo 'Checking for executable...')"
     ],
     "deny": [],
     "ask": []

@@ -172,6 +172,11 @@ class Emulator {
   // Terminates the currently running title.
   X_STATUS TerminateTitle();
 
+  // Closes the currently running title and performs full cleanup.
+  // Unlike TerminateTitle, this also unregisters devices, clears caches,
+  // and resets the kernel state to a clean state.
+  X_STATUS CloseTitle();
+
   // Launches a game from the given file path.
   // This will attempt to infer the type of the given file (such as an iso, etc)
   // using heuristics.
