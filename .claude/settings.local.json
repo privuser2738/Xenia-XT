@@ -112,7 +112,10 @@
       "WebFetch(domain:www.reddit.com)",
       "WebFetch(domain:xenia-emulator.com)",
       "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xam/*.cc)",
-      "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xboxkrnl/*.cc)"
+      "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xboxkrnl/*.cc)",
+      "Bash(./build-windows.bat help)",
+      "WebFetch(domain:archive.org)",
+      "Bash(git -C /c/Users/rob/source/001/xenia diff src/xenia/kernel/xam/xam_user.cc)"
     ],
     "deny": [],
     "ask": []

@@ -415,7 +415,7 @@ dword_result_t XamUserCheckPrivilege_entry(dword_t user_index, dword_t mask,
   }
 
   // If we deny everything, games should hopefully not try to do stuff.
-  *out_value = 0;
+  *out_value = 1;
   return X_ERROR_SUCCESS;
 }
 DECLARE_XAM_EXPORT1(XamUserCheckPrivilege, kUserProfiles, kStub);

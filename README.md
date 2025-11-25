@@ -4,69 +4,137 @@
     </a>
 </p>
 
-<h1 align="center">Xenia - Xbox 360 Emulator</h1>
+<h1 align="center">Xenia-XT - Xbox 360 Emulator</h1>
 
-Xenia is an experimental emulator for the Xbox 360. For more information, see the
-[main Xenia wiki](https://github.com/xenia-project/xenia/wiki).
+Xenia-XT is an enhanced fork of the Xenia Xbox 360 emulator, featuring improved
+compatibility, additional fixes, and quality-of-life enhancements. For the
+original project, see [Xenia](https://github.com/xenia-project/xenia).
 
-**Interested in supporting the core contributors?** Visit
-[Xenia Project on Patreon](https://www.patreon.com/xenia_project).
+## Features
 
-Come chat with us about **emulator-related topics** on [Discord](https://discord.gg/Q9mxZf9).
-For developer chat join `#dev` but stay on topic. Lurking is not only fine, but encouraged!
-Please check the [FAQ](https://github.com/xenia-project/xenia/wiki/FAQ) page before asking questions.
-We've got jobs/lives/etc, so don't expect instant answers.
+Xenia-XT includes several enhancements over the base Xenia emulator:
 
-Discussing illegal activities will get you banned.
+- **Improved Game Compatibility** - Additional fixes for games that don't work in standard Xenia
+- **Network Bypass Stubs** - Games requiring Xbox Live initialization can now boot in offline mode
+- **Crash Recovery System** - Automatic detection and workarounds for known crash points
+- **Game Compatibility Database** - Built-in database of game-specific fixes
+- **Enhanced UI** - Close Game menu option (Ctrl+W), improved file handling
+- **Better Stability** - Safe pause/resume, improved title switching
 
 ## Status
 
-Buildbot | Status | Releases
--------- | ------ | --------
-[Windows](https://ci.appveyor.com/project/benvanik/xenia/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/ftqiy86kdfawyx3a/branch/master?svg=true)](https://ci.appveyor.com/project/benvanik/xenia/branch/master) | [Latest](https://github.com/xenia-project/release-builds-windows/releases/latest) ◦ [All](https://github.com/xenia-project/release-builds-windows/releases)
-[Linux](https://cloud.drone.io/xenia-project/xenia) | [![Build status](https://cloud.drone.io/api/badges/xenia-project/xenia/status.svg)](https://cloud.drone.io/xenia-project/xenia)
+Xenia-XT is based on the latest Xenia codebase with additional enhancements.
+Many games that have issues in standard Xenia may work better in Xenia-XT.
 
-Quite a few real games run. Quite a few don't.
 See the [Game compatibility list](https://github.com/xenia-project/game-compatibility/issues)
-for currently tracked games, and feel free to contribute your own updates,
-screenshots, and information there following the [existing conventions](https://github.com/xenia-project/game-compatibility/blob/master/README.md).
+for tracked games from the main project.
 
 ## Disclaimer
 
 The goal of this project is to experiment, research, and educate on the topic
 of emulation of modern devices and operating systems. **It is not for enabling
 illegal activity**. All information is obtained via reverse engineering of
-legally purchased devices and games and information made public on the internet
-(you'd be surprised what's indexed on Google...).
+legally purchased devices and games and information made public on the internet.
 
 ## Quickstart
 
-See the [Quickstart](https://github.com/xenia-project/xenia/wiki/Quickstart) page.
+### Windows
+
+1. Download the latest release or build from source
+2. Run `xenia-xt.exe`
+3. Use File → Open to load an Xbox 360 game (ISO, XEX, or extracted folder)
+
+### Controls
+
+- **Ctrl+O** - Open game file
+- **Ctrl+W** - Close current game
+- **F11** - Toggle fullscreen
+- **F3** - Toggle profiler display
 
 ## Building
 
-See [building.md](docs/building.md) for setup and information about the
-`xb` script. When writing code, check the [style guide](docs/style_guide.md)
-and be sure to run clang-format!
+### Requirements (Windows)
 
-## Contributors Wanted!
+- Windows 10/11 (64-bit)
+- [Visual Studio 2022 or 2019](https://www.visualstudio.com/downloads/)
+- [Python 3.6+](https://www.python.org/downloads/) (ensure it's in PATH)
+- Windows SDK (10.0.22000.0 or newer)
 
-Have some spare time, know advanced C++, and want to write an emulator?
-Contribute! There's a ton of work that needs to be done, a lot of which
-is wide open greenfield fun.
+### Quick Build
 
-**For general rules and guidelines please see [CONTRIBUTING.md](.github/CONTRIBUTING.md).**
+```batch
+# Clone the repository
+git clone --recursive https://github.com/YourUsername/xenia-xt.git
+cd xenia-xt
 
-Fixes and optimizations are always welcome (please!), but in addition to
-that there are some major work areas still untouched:
+# Build (creates xenia-xt.exe in build\bin\Windows\Release\)
+build-windows.bat
 
-* Help work through [missing functionality/bugs in games](https://github.com/xenia-project/xenia/labels/compat)
-* Reduce the size of Xenia's [huge log files](https://github.com/xenia-project/xenia/issues/1526)
-* Skilled with Linux? A strong contributor is needed to [help with porting](https://github.com/xenia-project/xenia/labels/platform-linux)
+# Or build with options
+build-windows.bat --config=Debug
+build-windows.bat dist              # Build and create distribution package
+build-windows.bat help              # Show all options
+```
 
-See more projects [good for contributors](https://github.com/xenia-project/xenia/labels/good%20first%20issue). It's a good idea to ask on Discord and check the issues page before beginning work on
-something.
+### Build Commands
 
-## FAQ
+| Command | Description |
+|---------|-------------|
+| `build-windows.bat` | Build Release configuration |
+| `build-windows.bat --config=Debug` | Build Debug configuration |
+| `build-windows.bat setup` | Setup submodules and run premake |
+| `build-windows.bat clean` | Clean build outputs |
+| `build-windows.bat dist` | Build and create distribution in `dist/` folder |
+| `build-windows.bat help` | Show help message |
 
-See the [frequently asked questions](https://github.com/xenia-project/xenia/wiki/FAQ) page.
+### Advanced Build (using xb.cmd)
+
+For more advanced build options, use the `xb.cmd` script directly:
+
+```batch
+xb.cmd setup              # Initial setup
+xb.cmd build              # Build debug
+xb.cmd build --config Release  # Build release
+xb.cmd premake            # Regenerate project files
+xb.cmd devenv             # Open in Visual Studio
+xb.cmd format             # Format code
+```
+
+See [docs/building.md](docs/building.md) for detailed build instructions.
+
+## Configuration
+
+Xenia-XT stores configuration in:
+- Windows: `Documents\Xenia-XT\xenia-xt.config.toml`
+
+Common configuration options:
+
+```toml
+[GPU]
+gpu = "any"  # Options: any, d3d12, vulkan, null
+
+[Display]
+fullscreen = false
+```
+
+## Contributing
+
+Contributions are welcome! Please check:
+
+- [Style Guide](docs/style_guide.md) for code formatting
+- Run `xb.cmd format` before submitting PRs
+
+## License
+
+Xenia-XT is licensed under the BSD license. See [LICENSE](LICENSE) for details.
+
+## Credits
+
+- [Xenia Project](https://github.com/xenia-project/xenia) - Original emulator
+- All contributors to the Xenia project
+
+## Links
+
+- [Original Xenia Wiki](https://github.com/xenia-project/xenia/wiki)
+- [Original Xenia FAQ](https://github.com/xenia-project/xenia/wiki/FAQ)
+- [Game Compatibility List](https://github.com/xenia-project/game-compatibility/issues)
