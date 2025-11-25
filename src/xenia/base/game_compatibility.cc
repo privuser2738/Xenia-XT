@@ -164,6 +164,15 @@ void GameCompatibilityDatabase::InitializeBuiltInDatabase() {
 
   // Beautiful Katamari (4E4D083A)
   RegisterKnownGame(0x4E4D083A, "Beautiful Katamari", CompatibilityStatus::Playable);
+
+  // Soul Calibur V (4E4D083D) - Has multiple null pointer crashes in network code.
+  // Code patches prevent crashes, but game shows black screen during boot.
+  // Known unimplemented features: XamParty*, XamShowCommunitySessionsUI
+  // Status: Loads (boots without crash with patches, but stuck at black screen)
+  RegisterKnownGame(0x4E4D083D, "Soul Calibur V", CompatibilityStatus::Loads);
+
+  // Soul Calibur IV (4E4D07E0)
+  RegisterKnownGame(0x4E4D07E0, "Soul Calibur IV", CompatibilityStatus::Gameplay);
 }
 
 void GameCompatibilityDatabase::AddBuiltInFixes() {
@@ -278,6 +287,51 @@ void GameCompatibilityDatabase::AddBuiltInFixes() {
       fix.graphics_config.disable_tessellation = true;
       AddFix(title_id, fix);
     }
+  }
+
+  // Soul Calibur V - Null pointer crash fixes
+  // The game has multiple crashes due to uninitialized network/session objects.
+  // These patches prevent the crashes but the game still shows a black screen
+  // during boot, likely due to additional unimplemented features or the game
+  // being stuck in a network initialization loop.
+  // See: https://github.com/xenia-project/game-compatibility/issues/891
+  if (HasGameInfo(0x4E4D083D)) {
+    GameFix fix;
+    fix.type = FixType::CPUWorkaround;
+    fix.description = "Skip null pointer dereferences in network code";
+    fix.enabled = true;
+    fix.priority = 10;
+
+    // Crash 1 at 0x82100080: lwz r10, 4(r11) with r11=0
+    // The loop iterates through a linked list but the list head is null.
+    // Instead of skipping the whole loop, we NOP the problematic load.
+    // This allows the loop to continue naturally (r10 stays 0, loop exits).
+    // Original: lwz r10, 4(r11) (814B0004) - loads from null+4
+    // Patch: li r10, 0 (39400000) - safe value that will exit the loop
+    fix.cpu_config.code_patches[0x82100080] = 0x39400000;
+
+    // Crash 2 at 0x822A5BCC: lhz r11, 0(r11) with r11=0
+    // Original: lhz r11, 0(r11) (A16B0000) - loads from null
+    // Patch: li r11, 0 (39600000) - safe value instead of crash
+    fix.cpu_config.code_patches[0x822A5BCC] = 0x39600000;
+
+    // Crash 3 at 0x82543C04: lwz r9, 0(r3) with r3=0
+    // Original: lwz r9, 0(r3) (81230000) - loads from null
+    // Patch: li r9, 0 (39200000) - safe value instead of crash
+    fix.cpu_config.code_patches[0x82543C04] = 0x39200000;
+
+    AddFix(0x4E4D083D, fix);
+
+    // Graphics settings fix for SCV - similar to Halo 3
+    // The game may have rendering issues with render cache or shader compilation
+    GameFix gfx_fix;
+    gfx_fix.type = FixType::GraphicsSettings;
+    gfx_fix.description = "Fix rendering issues (light blue strip)";
+    gfx_fix.enabled = true;
+    gfx_fix.priority = 9;
+    gfx_fix.graphics_config.disable_render_cache = true;
+    gfx_fix.graphics_config.use_safe_shader_cache = true;
+    AddFix(0x4E4D083D, gfx_fix);
   }
 }
 

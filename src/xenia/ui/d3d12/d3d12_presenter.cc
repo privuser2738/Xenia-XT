@@ -317,7 +317,7 @@ D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread(
         assert_unhandled_case(surface_type);
         XELOGE(
             "D3D12Presenter: Tried to create a swap chain for an unsupported "
-            "Xenia surface type");
+            "Xenia-XT surface type");
         return SurfacePaintConnectResult::kFailureSurfaceUnusable;
     }
     if (FAILED(swap_chain_1->QueryInterface(

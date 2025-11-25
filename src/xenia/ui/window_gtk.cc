@@ -294,7 +294,7 @@ std::unique_ptr<Surface> GTKWindow::CreateSurfaceImpl(
   if (type_known && !type_supported_by_display) {
     XELOGE(
         "GTKWindow: The window system of the GTK window is not supported by "
-        "Xenia");
+        "Xenia-XT");
   }
   return nullptr;
 }

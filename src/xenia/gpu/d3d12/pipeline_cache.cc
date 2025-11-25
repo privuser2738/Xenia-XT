@@ -1751,7 +1751,7 @@ void PipelineCache::CreateDxbcGeometryShader(
   shader_out.resize(rdef_position_dwords +
                     sizeof(dxbc::RdefHeader) / sizeof(uint32_t));
   // Generator name.
-  dxbc::AppendAlignedString(shader_out, "Xenia");
+  dxbc::AppendAlignedString(shader_out, "Xenia-XT");
   {
     auto& rdef_header = *reinterpret_cast<dxbc::RdefHeader*>(
         shader_out.data() + rdef_position_dwords);

@@ -90,7 +90,7 @@ int ShowAssertionDialog(const char* message, const char* file, int line) {
   config.nDefaultButton = IDRETRY;
 
   // Convert strings to wide char
-  std::wstring wtitle = L"Xenia - Assertion Failed";
+  std::wstring wtitle = L"Xenia-XT - Assertion Failed";
   std::wstring wmain = L"A runtime assertion has failed";
 
   // For the content, we'll use expandable information to show the copyable

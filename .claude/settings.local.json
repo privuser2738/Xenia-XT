@@ -106,7 +106,13 @@
       "Bash(./build-linux.sh:*)",
       "Bash(./xb build:*)",
       "Bash(chmod:*)",
-      "Bash(./build-windows.bat)"
+      "Bash(./build-windows.bat)",
+      "Bash(reg query \"HKCU\\Environment\" /v VCTargetsPath)",
+      "Bash(reg query \"HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment\" /v VCTargetsPath)",
+      "WebFetch(domain:www.reddit.com)",
+      "WebFetch(domain:xenia-emulator.com)",
+      "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xam/*.cc)",
+      "Bash(for f in /c/Users/rob/source/001/xenia/src/xenia/kernel/xboxkrnl/*.cc)"
     ],
     "deny": [],
     "ask": []

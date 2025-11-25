@@ -875,6 +875,10 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
   }
 
   // Apply the scissor and prevent negative origin (behind the EDRAM base).
+  // NOTE: The scissor may not apply to resolve operations on real hardware.
+  // Some games set up scissor for partial-screen rendering but still resolve
+  // the full framebuffer. When the scissor would clip the resolve to zero size,
+  // we skip scissor clamping to allow the resolve to proceed.
   Scissor scissor;
   // False because clamping to the surface pitch will be done later (it will be
   // aligned to the resolve alignment here, for resolving from render targets
@@ -882,10 +886,24 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
   GetScissor(regs, scissor, false);
   int32_t scissor_right = int32_t(scissor.offset[0] + scissor.extent[0]);
   int32_t scissor_bottom = int32_t(scissor.offset[1] + scissor.extent[1]);
-  x0 = std::clamp(x0, int32_t(scissor.offset[0]), scissor_right);
-  y0 = std::clamp(y0, int32_t(scissor.offset[1]), scissor_bottom);
-  x1 = std::clamp(x1, int32_t(scissor.offset[0]), scissor_right);
-  y1 = std::clamp(y1, int32_t(scissor.offset[1]), scissor_bottom);
+
+  // Check if scissor would produce an empty region - if so, skip clamping
+  // This handles games that misconfigure scissor but still expect resolves to work
+  bool scissor_would_empty =
+      (x0 >= scissor_right || x1 <= int32_t(scissor.offset[0]) ||
+       y0 >= scissor_bottom || y1 <= int32_t(scissor.offset[1]));
+
+  if (!scissor_would_empty) {
+    x0 = std::clamp(x0, int32_t(scissor.offset[0]), scissor_right);
+    y0 = std::clamp(y0, int32_t(scissor.offset[1]), scissor_bottom);
+    x1 = std::clamp(x1, int32_t(scissor.offset[0]), scissor_right);
+    y1 = std::clamp(y1, int32_t(scissor.offset[1]), scissor_bottom);
+  } else {
+    // Scissor doesn't overlap resolve region - skip clamping but still prevent
+    // negative origins
+    x0 = std::max(x0, 0);
+    y0 = std::max(y0, 0);
+  }
 
   // Ensure coordinates are not inverted after clamping
   // This can happen with invalid guest input; swap to make valid
@@ -939,7 +957,6 @@ bool GetResolveInfo(const RegisterFile& regs, const Memory& memory,
   // (e.g., during loading screens or transitions). Handle gracefully by
   // returning success with zero dimensions - the caller will skip the operation.
   if (x0 >= x1 || y0 >= y1) {
-    XELOGW("Resolve region is empty (x: {} to {}, y: {} to {})", x0, x1, y0, y1);
     // Set zero dimensions so caller knows there's nothing to do
     info_out.coordinate_info.width_div_8 = 0;
     info_out.height_div_8 = 0;

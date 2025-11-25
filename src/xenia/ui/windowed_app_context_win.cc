@@ -69,7 +69,7 @@ bool Win32WindowedAppContext::Initialize() {
   // window instead of executing them between iterations so non-main message
   // loops, such as Windows modals, can execute pending functions too.
   static const WCHAR kPendingFunctionsWindowClassName[] =
-      L"XeniaPendingFunctionsWindowClass";
+      L"XeniaXTPendingFunctionsWindowClass";
   if (!pending_functions_window_class_registered_) {
     WNDCLASSEXW pending_functions_window_class = {};
     pending_functions_window_class.cbSize =
@@ -84,7 +84,7 @@ bool Win32WindowedAppContext::Initialize() {
     pending_functions_window_class_registered_ = true;
   }
   pending_functions_hwnd_ = CreateWindowExW(
-      0, kPendingFunctionsWindowClassName, L"Xenia Pending Functions",
+      0, kPendingFunctionsWindowClassName, L"Xenia-XT Pending Functions",
       WS_OVERLAPPED, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
       HWND_MESSAGE, nullptr, hinstance_, this);
   if (!pending_functions_hwnd_) {

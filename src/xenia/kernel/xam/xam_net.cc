@@ -708,6 +708,59 @@ dword_result_t NetDll_setsockopt_entry(dword_t caller, dword_t socket_handle,
 }
 DECLARE_XAM_EXPORT1(NetDll_setsockopt, kNetworking, kImplemented);
 
+dword_result_t NetDll_getsockopt_entry(dword_t caller, dword_t socket_handle,
+                                       dword_t level, dword_t optname,
+                                       lpvoid_t optval_ptr, lpdword_t optlen_ptr) {
+  auto socket =
+      kernel_state()->object_table()->LookupObject<XSocket>(socket_handle);
+  if (!socket) {
+    // WSAENOTSOCK
+    XThread::SetLastError(0x2736);
+    return -1;
+  }
+
+  // For now, return a stub implementation
+  // Most games just want to know the socket is valid
+  XELOGD("NetDll_getsockopt({}, level={}, optname={}) - stubbed",
+         socket_handle.value(), level.value(), optname.value());
+
+  // Return default values for common options
+  if (optval_ptr && optlen_ptr) {
+    uint32_t len = *optlen_ptr;
+    if (len >= 4) {
+      xe::store_and_swap<uint32_t>(optval_ptr, 0);
+      *optlen_ptr = 4;
+    }
+  }
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_getsockopt, kNetworking, kStub);
+
+dword_result_t NetDll_getsockname_entry(dword_t caller, dword_t socket_handle,
+                                        pointer_t<XSOCKADDR_IN> addr_ptr,
+                                        lpdword_t addrlen_ptr) {
+  auto socket =
+      kernel_state()->object_table()->LookupObject<XSocket>(socket_handle);
+  if (!socket) {
+    // WSAENOTSOCK
+    XThread::SetLastError(0x2736);
+    return -1;
+  }
+
+  XELOGD("NetDll_getsockname({}) - stubbed", socket_handle.value());
+
+  // Return a loopback address as the local address
+  if (addr_ptr && addrlen_ptr && *addrlen_ptr >= sizeof(XSOCKADDR_IN)) {
+    addr_ptr->sin_family = 2;  // AF_INET
+    addr_ptr->sin_port = 0;
+    addr_ptr->sin_addr = htonl(INADDR_LOOPBACK);  // 127.0.0.1 in network byte order
+    std::memset(addr_ptr->x_sin_zero, 0, sizeof(addr_ptr->x_sin_zero));
+    *addrlen_ptr = sizeof(XSOCKADDR_IN);
+  }
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_getsockname, kNetworking, kStub);
+
 dword_result_t NetDll_ioctlsocket_entry(dword_t caller, dword_t socket_handle,
                                         dword_t cmd, lpvoid_t arg_ptr) {
   auto socket =
@@ -1042,6 +1095,98 @@ void NetDll_WSASetLastError_entry(dword_t error_code) {
   XThread::SetLastError(error_code);
 }
 DECLARE_XAM_EXPORT1(NetDll_WSASetLastError, kNetworking, kImplemented);
+
+// Additional XNet stubs for games that require network initialization
+// These are needed by games like Soul Calibur V that check for Xbox Live
+
+dword_result_t NetDll_XNetConnect_entry(dword_t caller, lpvoid_t in_addr) {
+  // XNetConnect establishes a connection to a remote Xbox
+  // Return success - connection "established" (fake)
+  XELOGD("NetDll_XNetConnect({}) - stubbed, returning success", caller.value());
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetConnect, kNetworking, kStub);
+
+dword_result_t NetDll_XNetUnregisterInAddr_entry(dword_t caller,
+                                                  lpvoid_t in_addr) {
+  // Unregister a previously registered IN_ADDR
+  XELOGD("NetDll_XNetUnregisterInAddr({}) - stubbed", caller.value());
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetUnregisterInAddr, kNetworking, kStub);
+
+dword_result_t NetDll_XNetServerToInAddr_entry(dword_t caller,
+                                                lpvoid_t server_addr,
+                                                dword_t service_id,
+                                                lpvoid_t in_addr) {
+  // Convert server address to IN_ADDR
+  // Return failure - not connected to Xbox Live
+  XELOGD("NetDll_XNetServerToInAddr({}) - stubbed, returning error",
+         caller.value());
+  return 1;  // Error - no server connection
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetServerToInAddr, kNetworking, kStub);
+
+dword_result_t NetDll_XNetCreateKey_entry(dword_t caller, lpvoid_t session_id,
+                                           lpvoid_t key_exchange_key) {
+  // Create a new session key for secure communication
+  XELOGD("NetDll_XNetCreateKey({}) - stubbed, returning success", caller.value());
+  // Zero out the key area if provided - games expect valid memory
+  if (key_exchange_key) {
+    std::memset(key_exchange_key, 0, 16);  // Keys are typically 16 bytes
+  }
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetCreateKey, kNetworking, kStub);
+
+dword_result_t NetDll_XNetRegisterKey_entry(dword_t caller, lpvoid_t session_id,
+                                             lpvoid_t key_exchange_key) {
+  // Register a session key
+  XELOGD("NetDll_XNetRegisterKey({}) - stubbed, returning success",
+         caller.value());
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetRegisterKey, kNetworking, kStub);
+
+dword_result_t NetDll_XNetUnregisterKey_entry(dword_t caller,
+                                               lpvoid_t session_id) {
+  // Unregister a session key
+  XELOGD("NetDll_XNetUnregisterKey({}) - stubbed", caller.value());
+  return 0;
+}
+DECLARE_XAM_EXPORT1(NetDll_XNetUnregisterKey, kNetworking, kStub);
+
+dword_result_t XNetLogonGetTitleID_entry(lpdword_t title_id_ptr) {
+  // Returns the title ID of the currently signed-in title
+  // This is used for Xbox Live matchmaking
+  if (title_id_ptr) {
+    // Return the title ID from kernel state if available
+    auto xam = kernel_state()->GetKernelModule<XamModule>("xam.xex");
+    if (xam) {
+      *title_id_ptr = kernel_state()->title_id();
+      XELOGD("XNetLogonGetTitleID() returning {:08X}",
+             kernel_state()->title_id());
+      return 0;
+    }
+    *title_id_ptr = 0;
+  }
+  return 1;  // Error if no title
+}
+DECLARE_XAM_EXPORT1(XNetLogonGetTitleID, kNetworking, kStub);
+
+// XnpLogonGetStatus - Returns the current Xbox Live logon status
+// Status values:
+// 0 = Not signed in / offline
+// 1 = Signed in to Xbox Live
+// Games use this to determine if online features are available
+dword_result_t NetDll_XnpLogonGetStatus_entry(dword_t caller) {
+  // Return 0 = offline/not signed in to Xbox Live
+  // This tells games to use offline mode which is what we want
+  XELOGD("NetDll_XnpLogonGetStatus({}) - returning offline status",
+         caller.value());
+  return 0;  // Not signed in to Xbox Live
+}
+DECLARE_XAM_EXPORT1(NetDll_XnpLogonGetStatus, kNetworking, kStub);
 
 }  // namespace xam
 }  // namespace kernel

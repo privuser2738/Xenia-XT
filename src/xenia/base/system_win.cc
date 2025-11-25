@@ -32,15 +32,15 @@ void ShowSimpleMessageBox(SimpleMessageBoxType type,
   switch (type) {
     default:
     case SimpleMessageBoxType::Help:
-      title = L"Xenia Help";
+      title = L"Xenia-XT Help";
       type_flags |= MB_ICONINFORMATION;
       break;
     case SimpleMessageBoxType::Warning:
-      title = L"Xenia Warning";
+      title = L"Xenia-XT Warning";
       type_flags |= MB_ICONWARNING;
       break;
     case SimpleMessageBoxType::Error:
-      title = L"Xenia Error";
+      title = L"Xenia-XT Error";
       type_flags |= MB_ICONERROR;
       break;
   }

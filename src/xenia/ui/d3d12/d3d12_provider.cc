@@ -386,7 +386,7 @@ bool D3D12Provider::Initialize() {
       XELOGW(
           "Failed to create a Direct3D 12 direct command queue with global "
           "realtime priority, falling back to high priority, try launching "
-          "Xenia as administrator");
+          "Xenia-XT as administrator");
       queue_desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
       queue_created = SUCCEEDED(
           device->CreateCommandQueue(&queue_desc, IID_PPV_ARGS(&direct_queue)));

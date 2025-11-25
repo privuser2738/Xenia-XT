@@ -546,24 +546,32 @@ void Emulator::Pause() {
   paused_ = true;
 
   // Don't hold the lock on this (so any waits follow through)
-  graphics_system_->Pause();
-  audio_system_->Pause();
+  // Safety checks: only pause systems that are initialized
+  if (graphics_system_) {
+    graphics_system_->Pause();
+  }
+  if (audio_system_) {
+    audio_system_->Pause();
+  }
 
-  auto lock = global_critical_region::AcquireDirect();
-  auto threads =
-      kernel_state()->object_table()->GetObjectsByType<kernel::XThread>(
-          kernel::XObject::Type::Thread);
-  auto current_thread = kernel::XThread::IsInThread()
-                            ? kernel::XThread::GetCurrentThread()
-                            : nullptr;
-  for (auto thread : threads) {
-    // Don't pause ourself or host threads.
-    if (thread == current_thread || !thread->can_debugger_suspend()) {
-      continue;
-    }
+  // Only suspend threads if kernel state is initialized
+  if (kernel_state_) {
+    auto lock = global_critical_region::AcquireDirect();
+    auto threads =
+        kernel_state()->object_table()->GetObjectsByType<kernel::XThread>(
+            kernel::XObject::Type::Thread);
+    auto current_thread = kernel::XThread::IsInThread()
+                              ? kernel::XThread::GetCurrentThread()
+                              : nullptr;
+    for (auto thread : threads) {
+      // Don't pause ourself or host threads.
+      if (thread == current_thread || !thread->can_debugger_suspend()) {
+        continue;
+      }
 
-    if (thread->is_running()) {
-      thread->thread()->Suspend(nullptr);
+      if (thread->is_running()) {
+        thread->thread()->Suspend(nullptr);
+      }
     }
   }
 
@@ -577,20 +585,28 @@ void Emulator::Resume() {
   paused_ = false;
   XELOGD("! EMULATOR RESUMED !");
 
-  graphics_system_->Resume();
-  audio_system_->Resume();
+  // Safety checks: only resume systems that are initialized
+  if (graphics_system_) {
+    graphics_system_->Resume();
+  }
+  if (audio_system_) {
+    audio_system_->Resume();
+  }
 
-  auto threads =
-      kernel_state()->object_table()->GetObjectsByType<kernel::XThread>(
-          kernel::XObject::Type::Thread);
-  for (auto thread : threads) {
-    if (!thread->can_debugger_suspend()) {
-      // Don't pause host threads.
-      continue;
-    }
+  // Only resume threads if kernel state is initialized
+  if (kernel_state_) {
+    auto threads =
+        kernel_state()->object_table()->GetObjectsByType<kernel::XThread>(
+            kernel::XObject::Type::Thread);
+    for (auto thread : threads) {
+      if (!thread->can_debugger_suspend()) {
+        // Don't pause host threads.
+        continue;
+      }
 
-    if (thread->is_running()) {
-      thread->thread()->Resume(nullptr);
+      if (thread->is_running()) {
+        thread->thread()->Resume(nullptr);
+      }
     }
   }
 }
@@ -747,11 +763,92 @@ bool Emulator::ExceptionCallback(Exception* ex) {
   auto context = current_thread->thread_state()->context();
 
   XELOGE("==== CRASH DUMP ====");
+  XELOGE("Exception Type: {}",
+         ex->code() == Exception::Code::kAccessViolation ? "ACCESS_VIOLATION" :
+         ex->code() == Exception::Code::kIllegalInstruction ? "ILLEGAL_INSTRUCTION" :
+         "UNKNOWN");
+  if (ex->code() == Exception::Code::kAccessViolation) {
+    uint64_t fault_addr = ex->fault_address();
+    XELOGE("Fault Address: 0x{:016X}", fault_addr);
+    XELOGE("Operation: {}",
+           ex->access_violation_operation() == Exception::AccessViolationOperation::kRead ? "READ" :
+           ex->access_violation_operation() == Exception::AccessViolationOperation::kWrite ? "WRITE" :
+           "UNKNOWN");
+
+    // Calculate guest address from fault address for better diagnostics
+    uint64_t virtual_membase = reinterpret_cast<uint64_t>(memory_->virtual_membase());
+    uint64_t physical_membase = reinterpret_cast<uint64_t>(memory_->physical_membase());
+
+    if (fault_addr >= virtual_membase && fault_addr < virtual_membase + 0x100000000ull) {
+      uint32_t guest_virtual_addr = static_cast<uint32_t>(fault_addr - virtual_membase);
+      XELOGE("Guest Virtual Address: 0x{:08X}", guest_virtual_addr);
+      if (guest_virtual_addr < 0x10000) {
+        XELOGE("*** NULL POINTER DEREFERENCE DETECTED ***");
+        XELOGE("The game attempted to access memory near address 0 (offset +0x{:X})", guest_virtual_addr);
+      }
+    } else if (fault_addr >= physical_membase && fault_addr < physical_membase + 0x20000000ull) {
+      uint32_t guest_physical_addr = static_cast<uint32_t>(fault_addr - physical_membase);
+      XELOGE("Guest Physical Address: 0x{:08X}", guest_physical_addr);
+      if (guest_physical_addr < 0x10000) {
+        XELOGE("*** NULL POINTER DEREFERENCE DETECTED ***");
+        XELOGE("The game attempted to access physical memory near address 0 (offset +0x{:X})", guest_physical_addr);
+      }
+    } else {
+      XELOGE("Address is outside emulated memory ranges - possible corruption");
+    }
+  }
+  XELOGE("Host PC (RIP): 0x{:016X}", ex->pc());
   XELOGE("Thread ID (Host: 0x{:08X} / Guest: 0x{:08X})",
          current_thread->thread()->system_id(), current_thread->thread_id());
   XELOGE("Thread Handle: 0x{:08X}", current_thread->handle());
-  XELOGE("PC: 0x{:08X}",
-         guest_function->MapMachineCodeToGuestAddress(ex->pc()));
+  uint32_t guest_pc = guest_function->MapMachineCodeToGuestAddress(ex->pc());
+  XELOGE("Guest PC: 0x{:08X}", guest_pc);
+
+  // Try to dump the PPC instructions around the crash location
+  XELOGE("PPC Instructions around crash (showing 8 before, crash, 4 after):");
+  for (int offset = -8; offset <= 4; offset++) {
+    uint32_t addr = guest_pc + (offset * 4);
+    uint32_t* guest_instr_ptr = memory_->TranslateVirtual<uint32_t*>(addr);
+    if (guest_instr_ptr) {
+      uint32_t instr = xe::byte_swap(*guest_instr_ptr);
+      const char* marker = (offset == 0) ? " <-- CRASH" : "";
+      XELOGE("  {:08X}: {:08X}{}", addr, instr, marker);
+    }
+  }
+
+  // Decode the crashing instruction
+  uint32_t* crash_instr_ptr = memory_->TranslateVirtual<uint32_t*>(guest_pc);
+  if (crash_instr_ptr) {
+    uint32_t instr = xe::byte_swap(*crash_instr_ptr);
+    uint32_t opcode = (instr >> 26) & 0x3F;
+    if (opcode == 32) {  // lwz
+      uint32_t rt = (instr >> 21) & 0x1F;
+      uint32_t ra = (instr >> 16) & 0x1F;
+      int16_t d = static_cast<int16_t>(instr & 0xFFFF);
+      XELOGE("Crashing instruction: lwz r{}, {}(r{}) - Loading from [r{} + {}]", rt, d, ra, ra, d);
+    } else if (opcode == 31) {
+      uint32_t xo = (instr >> 1) & 0x3FF;
+      if (xo == 23) {  // lwzx
+        uint32_t rt = (instr >> 21) & 0x1F;
+        uint32_t ra = (instr >> 16) & 0x1F;
+        uint32_t rb = (instr >> 11) & 0x1F;
+        XELOGE("Crashing instruction: lwzx r{}, r{}, r{} - Loading from [r{} + r{}]", rt, ra, rb, ra, rb);
+      }
+    }
+  }
+
+  // Dump memory around key registers that might contain null pointers
+  XELOGE("Memory dump around r31 (0x{:08X}):", static_cast<uint32_t>(context->r[31]));
+  uint32_t r31_addr = static_cast<uint32_t>(context->r[31]);
+  if (r31_addr >= 0x40000000 && r31_addr < 0x50000000) {
+    uint32_t* mem = memory_->TranslateVirtual<uint32_t*>(r31_addr);
+    if (mem) {
+      for (int i = 0; i < 16; i++) {
+        XELOGE("  {:08X}: {:08X}", r31_addr + i * 4, xe::byte_swap(mem[i]));
+      }
+    }
+  }
+
   XELOGE("Registers:");
   for (int i = 0; i < 32; i++) {
     XELOGE(" r{:<3} = {:016X}", i, context->r[i]);
@@ -1012,6 +1109,43 @@ X_STATUS Emulator::CompleteLaunch(const std::filesystem::path& path,
 
       // Apply all known fixes for this game
       compat_db.ApplyFixes(title_id_.value());
+
+      // Apply code patches for this game
+      auto fixes = compat_db.GetFixes(title_id_.value());
+      for (const auto& fix : fixes) {
+        if (!fix.enabled) continue;
+        if (fix.type == game_compatibility::FixType::CPUWorkaround &&
+            !fix.cpu_config.code_patches.empty()) {
+          XELOGI("Applying {} code patches for {}", fix.cpu_config.code_patches.size(), fix.description);
+          for (const auto& patch : fix.cpu_config.code_patches) {
+            uint32_t addr = patch.first;
+            uint32_t value = patch.second;
+
+            // Make memory writable for patching
+            auto heap = memory_->LookupHeap(addr);
+            if (heap) {
+              uint32_t old_protect = 0;
+              heap->QueryProtect(addr, &old_protect);
+
+              // Temporarily make writable
+              uint32_t new_protect = old_protect | kMemoryProtectWrite;
+              heap->Protect(addr, 4, new_protect, nullptr);
+
+              uint32_t* target = memory_->TranslateVirtual<uint32_t*>(addr);
+              if (target) {
+                uint32_t original = xe::byte_swap(*target);
+                *target = xe::byte_swap(value);
+                XELOGI("  Patched {:08X}: {:08X} -> {:08X}", addr, original, value);
+              }
+
+              // Restore original protection
+              heap->Protect(addr, 4, old_protect, nullptr);
+            } else {
+              XELOGW("  Failed to patch {:08X}: no heap found", addr);
+            }
+          }
+        }
+      }
     } else {
       XELOGI("No compatibility data for title {:08X}", title_id_.value());
     }

@@ -48,6 +48,8 @@ LONG CALLBACK ExceptionHandlerCallback(PEXCEPTION_POINTERS ex_info) {
   Exception ex;
   switch (ex_info->ExceptionRecord->ExceptionCode) {
     case STATUS_ILLEGAL_INSTRUCTION:
+      // Log details about illegal instruction for debugging
+      OutputDebugStringA("XENIA: STATUS_ILLEGAL_INSTRUCTION at RIP=");
       ex.InitializeIllegalInstruction(&thread_context);
       break;
     case STATUS_ACCESS_VIOLATION: {
@@ -70,6 +72,14 @@ LONG CALLBACK ExceptionHandlerCallback(PEXCEPTION_POINTERS ex_info) {
           &thread_context, ex_info->ExceptionRecord->ExceptionInformation[1],
           access_violation_operation);
     } break;
+    case STATUS_PRIVILEGED_INSTRUCTION:
+      // Privileged instruction - might indicate CPU emulation issue
+      OutputDebugStringA("XENIA: STATUS_PRIVILEGED_INSTRUCTION\n");
+      return EXCEPTION_CONTINUE_SEARCH;
+    case STATUS_INTEGER_DIVIDE_BY_ZERO:
+      // Division by zero in JIT code
+      OutputDebugStringA("XENIA: STATUS_INTEGER_DIVIDE_BY_ZERO\n");
+      return EXCEPTION_CONTINUE_SEARCH;
     default:
       // Unknown/unhandled type.
       return EXCEPTION_CONTINUE_SEARCH;

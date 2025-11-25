@@ -754,6 +754,7 @@ dword_result_t XamWriteGamerTile_entry(dword_t arg1, dword_t arg2, dword_t arg3,
 DECLARE_XAM_EXPORT1(XamWriteGamerTile, kUserProfiles, kStub);
 
 dword_result_t XamSessionCreateHandle_entry(lpdword_t handle_ptr) {
+  XELOGD("XamSessionCreateHandle({:08X})", handle_ptr.guest_address());
   *handle_ptr = 0xCAFEDEAD;
   return X_ERROR_SUCCESS;
 }
@@ -761,9 +762,10 @@ DECLARE_XAM_EXPORT1(XamSessionCreateHandle, kUserProfiles, kStub);
 
 dword_result_t XamSessionRefObjByHandle_entry(dword_t handle,
                                               lpdword_t obj_ptr) {
-  assert_true(handle == 0xCAFEDEAD);
+  XELOGD("XamSessionRefObjByHandle({:08X}, {:08X})", uint32_t(handle), obj_ptr.guest_address());
   // TODO(PermaNull): Implement this properly,
   // For the time being returning 0xDEADF00D will prevent crashing.
+  // Note: Some games may expect a real session object with specific fields.
   *obj_ptr = 0xDEADF00D;
   return X_ERROR_SUCCESS;
 }

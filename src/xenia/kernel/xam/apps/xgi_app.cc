@@ -72,11 +72,24 @@ X_HRESULT XgiApp::DispatchMessageSync(uint32_t message, uint32_t buffer_ptr,
       uint32_t session_info_ptr = xe::load_and_swap<uint32_t>(buffer + 0x14);
       uint32_t nonce_ptr = xe::load_and_swap<uint32_t>(buffer + 0x18);
 
-      XELOGD(
+      XELOGW(
           "XGISessionCreateImpl({:08X}, {:08X}, {}, {}, {:08X}, {:08X}, "
-          "{:08X})",
+          "{:08X}) - session creation stubbed",
           session_ptr, flags, num_slots_public, num_slots_private, user_xuid,
           session_info_ptr, nonce_ptr);
+
+      // Initialize session_info if provided - games may expect valid data here
+      if (session_info_ptr) {
+        auto session_info = memory_->TranslateVirtual(session_info_ptr);
+        // Zero out the session info structure (typically 0x164 bytes)
+        std::memset(session_info, 0, 0x164);
+      }
+
+      // Initialize nonce if provided
+      if (nonce_ptr) {
+        xe::store_and_swap<uint64_t>(memory_->TranslateVirtual(nonce_ptr), 0x1234567890ABCDEF);
+      }
+
       return X_E_SUCCESS;
     }
     case 0x000B0011: {
@@ -117,13 +130,14 @@ X_HRESULT XgiApp::DispatchMessageSync(uint32_t message, uint32_t buffer_ptr,
           context_ptr ? memory_->TranslateVirtual(context_ptr) : nullptr;
       uint32_t context_id =
           context ? xe::load_and_swap<uint32_t>(context + 0) : 0;
-      XELOGD("XGIUserGetContext({:08X}, {:08X}{:08X}))", user_index,
+      XELOGD("XGIUserGetContext({:08X}, {:08X}, context_id={:08X})", user_index,
              context_ptr, context_id);
       uint32_t value = 0;
       if (context) {
         xe::store_and_swap<uint32_t>(context + 4, value);
       }
-      return X_E_FAIL;
+      // Return success - games like Soul Calibur V may hang if this fails
+      return X_E_SUCCESS;
     }
     case 0x000B0071: {
       XELOGD("XGI 0x000B0071, unimplemented");

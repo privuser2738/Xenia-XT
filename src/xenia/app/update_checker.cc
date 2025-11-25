@@ -128,7 +128,7 @@ bool UpdateChecker::IsNewerVersion(const std::string& current, const std::string
 
 bool UpdateChecker::HttpGet(const std::string& url, std::string& response) {
 #if XE_PLATFORM_WIN32
-  HINTERNET hSession = WinHttpOpen(L"Xenia Update Checker/1.0",
+  HINTERNET hSession = WinHttpOpen(L"Xenia-XT Update Checker/1.0",
                                     WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
                                     WINHTTP_NO_PROXY_NAME,
                                     WINHTTP_NO_PROXY_BYPASS, 0);

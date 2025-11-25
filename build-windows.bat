@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================================
-REM Xenia Windows Build Script - Outputs to dist folder
+REM Xenia-XT Windows Build Script - Outputs to dist folder
 REM ============================================================================
 
 SETLOCAL ENABLEDELAYEDEXPANSION
@@ -9,7 +9,7 @@ SET "ROOT_DIR=%~dp0"
 cd /d "%ROOT_DIR%"
 
 echo ============================================================================
-echo Xenia Windows Build - Release
+echo Xenia-XT Windows Build - Release
 echo ============================================================================
 echo.
 
@@ -46,27 +46,27 @@ if not exist "%DIST_DIR%" mkdir "%DIST_DIR%"
 
 REM Clean old files
 echo [DIST] Cleaning old distribution files...
-if exist "%DIST_DIR%\xenia.exe" del /q "%DIST_DIR%\xenia.exe"
-if exist "%DIST_DIR%\xenia.pdb" del /q "%DIST_DIR%\xenia.pdb"
+if exist "%DIST_DIR%\xenia-xt.exe" del /q "%DIST_DIR%\xenia-xt.exe"
+if exist "%DIST_DIR%\xenia-xt.pdb" del /q "%DIST_DIR%\xenia-xt.pdb"
 if exist "%DIST_DIR%\LICENSE" del /q "%DIST_DIR%\LICENSE"
 
 REM Copy main executable
-echo [DIST] Copying xenia.exe...
-if exist "%BUILD_DIR%\xenia.exe" (
-    copy /y "%BUILD_DIR%\xenia.exe" "%DIST_DIR%\" >nul
+echo [DIST] Copying xenia-xt.exe...
+if exist "%BUILD_DIR%\xenia-xt.exe" (
+    copy /y "%BUILD_DIR%\xenia-xt.exe" "%DIST_DIR%\" >nul
     if errorlevel 1 (
-        echo [ERROR] Failed to copy xenia.exe
+        echo [ERROR] Failed to copy xenia-xt.exe
         exit /b 1
     )
 ) else (
-    echo [ERROR] xenia.exe not found in build output!
+    echo [ERROR] xenia-xt.exe not found in build output!
     exit /b 1
 )
 
 REM Copy PDB for debugging (optional but useful)
-echo [DIST] Copying xenia.pdb...
-if exist "%BUILD_DIR%\xenia.pdb" (
-    copy /y "%BUILD_DIR%\xenia.pdb" "%DIST_DIR%\" >nul
+echo [DIST] Copying xenia-xt.pdb...
+if exist "%BUILD_DIR%\xenia-xt.pdb" (
+    copy /y "%BUILD_DIR%\xenia-xt.pdb" "%DIST_DIR%\" >nul
 )
 
 REM Copy LICENSE file
@@ -96,7 +96,7 @@ dir /b "%DIST_DIR%"
 echo.
 
 REM Show executable info
-for %%F in ("%DIST_DIR%\xenia.exe") do (
+for %%F in ("%DIST_DIR%\xenia-xt.exe") do (
     echo Executable: %%~nxF
     echo Size:       %%~zF bytes
     echo Built:      %%~tF

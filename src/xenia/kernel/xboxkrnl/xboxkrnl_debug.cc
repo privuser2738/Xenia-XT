@@ -124,22 +124,80 @@ void HandleCppException(pointer_t<X_EXCEPTION_RECORD> record) {
 }
 
 void RtlRaiseException_entry(pointer_t<X_EXCEPTION_RECORD> record) {
+  // Log exception details for debugging
+  XELOGD("RtlRaiseException: code=0x{:08X}, flags=0x{:08X}, address=0x{:08X}, params={}",
+         uint32_t(record->code), uint32_t(record->exception_flags),
+         uint32_t(record->exception_address), uint32_t(record->number_parameters));
+
   switch (record->code) {
     case 0x406D1388: {
+      // SetThreadName exception - this is a benign debugging exception
+      // used to name threads in debuggers. Handle it and continue execution.
       HandleSetThreadName(record);
+      // Mark as handled - the exception is continuable
       return;
     }
     case 0xE06D7363: {
+      // C++ exception - these need proper SEH unwinding
       HandleCppException(record);
+      return;
+    }
+    case 0x80000003: {
+      // STATUS_BREAKPOINT - debug breakpoint
+      XELOGD("RtlRaiseException: Breakpoint exception - continuing");
+      return;
+    }
+    case 0x80000004: {
+      // STATUS_SINGLE_STEP - single step exception (debugger)
+      XELOGD("RtlRaiseException: Single step exception - continuing");
+      return;
+    }
+    case 0xC0000005: {
+      // STATUS_ACCESS_VIOLATION - this is a real crash
+      XELOGE("RtlRaiseException: Access violation at 0x{:08X}",
+             uint32_t(record->exception_address));
+      xe::debugging::Break();
+      return;
+    }
+    case 0xC0000094: {
+      // STATUS_INTEGER_DIVIDE_BY_ZERO
+      XELOGE("RtlRaiseException: Integer divide by zero at 0x{:08X}",
+             uint32_t(record->exception_address));
+      xe::debugging::Break();
+      return;
+    }
+    case 0xC00000FD: {
+      // STATUS_STACK_OVERFLOW
+      XELOGE("RtlRaiseException: Stack overflow at 0x{:08X}",
+             uint32_t(record->exception_address));
+      xe::debugging::Break();
       return;
     }
   }
 
-  // TODO(benvanik): unwinding.
-  // This is going to suck.
-  xe::debugging::Break();
+  // For other exceptions, check if they're continuable
+  // EXCEPTION_NONCONTINUABLE = 0x1
+  if (record->exception_flags & 0x1) {
+    // Non-continuable exception - this is fatal
+    XELOGE("RtlRaiseException: Non-continuable exception 0x{:08X} at 0x{:08X}",
+           uint32_t(record->code), uint32_t(record->exception_address));
+    xe::debugging::Break();
+  } else {
+    // Continuable exception - log and continue
+    // Many games raise exceptions that they expect to handle themselves
+    XELOGW("RtlRaiseException: Unhandled continuable exception 0x{:08X} at 0x{:08X} - continuing",
+           uint32_t(record->code), uint32_t(record->exception_address));
+  }
+
+  // Return normally - the caller's SEH handler should deal with this
+  // TODO(benvanik): Full SEH unwinding support would require:
+  // 1. Walking the stack to find exception handlers
+  // 2. Calling __C_specific_handler or language-specific handlers
+  // 3. Executing finally blocks
+  // 4. Transferring control to the appropriate handler
+  // For now, we just return and hope the game handles it
 }
-DECLARE_XBOXKRNL_EXPORT2(RtlRaiseException, kDebug, kStub, kImportant);
+DECLARE_XBOXKRNL_EXPORT2(RtlRaiseException, kDebug, kImplemented, kImportant);
 
 void KeBugCheckEx_entry(dword_t code, dword_t param1, dword_t param2,
                         dword_t param3, dword_t param4) {

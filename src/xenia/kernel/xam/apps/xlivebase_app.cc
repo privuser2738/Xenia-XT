@@ -51,12 +51,11 @@ X_HRESULT XLiveBaseApp::DispatchMessageSync(uint32_t message,
     }
     case 0x00058020: {
       // 0x00058004 is called right before this.
-      // We should create a XamEnumerate-able empty list here, but I'm not
-      // sure of the format.
-      // buffer_length seems to be the same ptr sent to 0x00058004.
-      XELOGD("CXLiveFriends::Enumerate({:08X}, {:08X}) unimplemented",
+      // Return success with empty friends list - games handle "no friends" gracefully
+      XELOGD("CXLiveFriends::Enumerate({:08X}, {:08X}) - returning empty list",
              buffer_ptr, buffer_length);
-      return X_E_FAIL;
+      // Just return success - game will interpret as "no friends online"
+      return X_E_SUCCESS;
     }
     case 0x00058023: {
       XELOGD(

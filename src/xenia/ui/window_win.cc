@@ -87,7 +87,7 @@ bool Win32Window::OpenImpl() {
     // Matches the black background color of the presenter's painting.
     wcex.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wcex.lpszMenuName = nullptr;
-    wcex.lpszClassName = L"XeniaWindowClass";
+    wcex.lpszClassName = L"XeniaXTWindowClass";
     if (!RegisterClassExW(&wcex)) {
       XELOGE("RegisterClassEx failed");
       return false;
@@ -146,7 +146,7 @@ bool Win32Window::OpenImpl() {
   // the assignment here to handle the case of a failure after WM_NCCREATE, for
   // instance.
   hwnd_ = CreateWindowExW(
-      window_ex_style, L"XeniaWindowClass",
+      window_ex_style, L"XeniaXTWindowClass",
       reinterpret_cast<LPCWSTR>(xe::to_utf16(GetTitle()).c_str()), window_style,
       window_x, window_y,
       window_size_rect.right - window_size_rect.left,

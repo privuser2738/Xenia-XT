@@ -149,7 +149,34 @@ IF NOT "%TARGET%"=="" (
     )
 )
 
-"%MSBUILD%" build\xenia.sln /nologo /m /v:m /p:Configuration=%CONFIG% /p:Platform=Windows %BUILD_TARGET%
+REM Use VsDevCmd.bat to properly set up the VS build environment
+REM This ensures VCTargetsPath and other variables are correctly configured
+SET "VS_DEVENV="
+FOR %%D IN (
+    "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\18\Professional\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\18\Enterprise\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+    "C:\Program Files\Microsoft Visual Studio\2019\Professional\Common7\Tools\VsDevCmd.bat"
+) DO (
+    IF EXIST %%D (
+        SET "VS_DEVENV=%%~D"
+        GOTO :found_vsdevcmd
+    )
+)
+:found_vsdevcmd
+
+IF DEFINED VS_DEVENV (
+    ECHO Using VsDevCmd.bat for build environment...
+    cmd /c ""!VS_DEVENV!" -arch=amd64 -host_arch=amd64 >nul 2>&1 && "%MSBUILD%" build\xenia.sln /nologo /m /v:m /p:Configuration=%CONFIG% /p:Platform=Windows %BUILD_TARGET%"
+) ELSE (
+    "%MSBUILD%" build\xenia.sln /nologo /m /v:m /p:Configuration=%CONFIG% /p:Platform=Windows %BUILD_TARGET%
+)
 IF ERRORLEVEL 1 (
     ECHO ERROR: Build failed.
     EXIT /B 1
@@ -329,6 +356,10 @@ REM because it comes with C++ build tools pre-configured
 
 REM First, try to find Visual Studio's msbuild (has C++ tools built-in)
 FOR %%D IN (
+    "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
+    "C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe"
+    "C:\Program Files\Microsoft Visual Studio\18\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
+    "C:\Program Files\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
     "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe"
     "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe"
     "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
@@ -399,6 +430,9 @@ REM Helper: Setup VCTargets Path for C++ Builds
 REM ============================================================================
 :setup_vctargets_path
 SET "MSBUILD_PATH=%~1"
+
+REM Clear any existing VCTargetsPath to avoid using corrupted user environment values
+SET "VCTargetsPath="
 
 REM Try to find VS installation from msbuild path
 REM Expected path: ...\Microsoft Visual Studio\YEAR\EDITION\MSBuild\...

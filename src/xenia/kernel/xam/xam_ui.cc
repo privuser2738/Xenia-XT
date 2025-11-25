@@ -528,12 +528,20 @@ void XamShowDirtyDiscErrorUI_entry(dword_t user_index) {
 DECLARE_XAM_EXPORT1(XamShowDirtyDiscErrorUI, kUI, kImplemented);
 
 dword_result_t XamShowPartyUI_entry(unknown_t r3, unknown_t r4) {
-  return X_ERROR_FUNCTION_FAILED;
+  // Return success - game may hang waiting for UI if this fails
+  // Broadcast XN_SYS_UI (off) notification to indicate UI dismissed
+  XELOGD("XamShowPartyUI({}, {}) - stubbed, returning success", uint32_t(r3), uint32_t(r4));
+  kernel_state()->BroadcastNotification(0x00000009, 0);
+  return X_ERROR_SUCCESS;
 }
 DECLARE_XAM_EXPORT1(XamShowPartyUI, kNone, kStub);
 
 dword_result_t XamShowCommunitySessionsUI_entry(unknown_t r3, unknown_t r4) {
-  return X_ERROR_FUNCTION_FAILED;
+  // Return success - game may hang waiting for UI if this fails
+  // Broadcast XN_SYS_UI (off) notification to indicate UI dismissed
+  XELOGD("XamShowCommunitySessionsUI({}, {}) - stubbed, returning success", uint32_t(r3), uint32_t(r4));
+  kernel_state()->BroadcastNotification(0x00000009, 0);
+  return X_ERROR_SUCCESS;
 }
 DECLARE_XAM_EXPORT1(XamShowCommunitySessionsUI, kNone, kStub);
 

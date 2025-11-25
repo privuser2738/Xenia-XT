@@ -134,7 +134,7 @@ using xe::ui::KeyEvent;
 using xe::ui::MenuItem;
 using xe::ui::UIEvent;
 
-const std::string kBaseTitle = "Xenia";
+const std::string kBaseTitle = "Xenia-XT";
 
 EmulatorWindow::EmulatorWindow(Emulator* emulator,
                                ui::WindowedAppContext& app_context)
@@ -516,11 +516,9 @@ bool EmulatorWindow::Initialize() {
     file_menu->AddChild(
         MenuItem::Create(MenuItem::Type::kString, "Open &Folder...", "Ctrl+Shift+O",
                          std::bind(&EmulatorWindow::FileOpenFolder, this)));
-#ifdef DEBUG
     file_menu->AddChild(
-        MenuItem::Create(MenuItem::Type::kString, "Close",
+        MenuItem::Create(MenuItem::Type::kString, "Close &Game", "Ctrl+W",
                          std::bind(&EmulatorWindow::FileClose, this)));
-#endif  // #ifdef DEBUG
     file_menu->AddChild(MenuItem::Create(MenuItem::Type::kSeparator));
     file_menu->AddChild(MenuItem::Create(
         MenuItem::Type::kString, "Show content directory...",
@@ -756,6 +754,12 @@ void EmulatorWindow::OnKeyDown(ui::KeyEvent& e) {
       }
       FileOpen();
     } break;
+    case ui::VirtualKey::kW: {
+      if (!e.is_ctrl_pressed()) {
+        return;
+      }
+      FileClose();
+    } break;
     case ui::VirtualKey::kMultiply: {
       CpuTimeScalarReset();
     } break;
@@ -842,6 +846,14 @@ void EmulatorWindow::FileDrop(const std::filesystem::path& filename) {
 void EmulatorWindow::FileOpen() {
   std::filesystem::path path;
 
+  // Pause emulation while file dialog is open to prevent race conditions
+  // and ensure GPU/CPU threads aren't running when we try to terminate
+  bool was_title_open = emulator_->is_title_open();
+  if (was_title_open) {
+    XELOGI("FileOpen: Pausing emulation while file dialog is open...");
+    emulator_->Pause();
+  }
+
   auto file_picker = xe::ui::FilePicker::Create();
   file_picker->set_mode(ui::FilePicker::Mode::kOpen);
   file_picker->set_type(ui::FilePicker::Type::kFile);
@@ -862,25 +874,32 @@ void EmulatorWindow::FileOpen() {
   }
 
   if (!path.empty()) {
-    // Close any currently running title before launching a new one to prevent halt
-    if (emulator_->is_title_open()) {
-      XELOGI("Closing current title before loading new file...");
-      emulator_->TerminateTitle();
-    }
-
-    // Normalize the path and make absolute.
+    // User selected a file - LaunchPath will handle terminating the current title
+    // Note: Don't resume here since we're about to terminate anyway
     auto abs_path = std::filesystem::absolute(path);
     auto result = emulator_->LaunchPath(abs_path);
     if (XFAILED(result)) {
       // TODO: Display a message box.
       XELOGE("Failed to launch target: {:08X}", result);
     }
+  } else if (was_title_open) {
+    // User cancelled - resume the emulation
+    XELOGI("FileOpen: User cancelled, resuming emulation...");
+    emulator_->Resume();
   }
 }
 
 
 void EmulatorWindow::FileOpenFolder() {
   std::filesystem::path path;
+
+  // Pause emulation while file dialog is open to prevent race conditions
+  // and ensure GPU/CPU threads aren't running when we try to terminate
+  bool was_title_open = emulator_->is_title_open();
+  if (was_title_open) {
+    XELOGI("FileOpenFolder: Pausing emulation while file dialog is open...");
+    emulator_->Pause();
+  }
 
   auto file_picker = xe::ui::FilePicker::Create();
   file_picker->set_mode(ui::FilePicker::Mode::kOpen);
@@ -895,20 +914,41 @@ void EmulatorWindow::FileOpenFolder() {
   }
 
   if (!path.empty()) {
-    // Normalize the path and make absolute.
-    // Use LaunchPath which handles cleanup and routes to LaunchFolder for directories
+    // User selected a folder - LaunchPath will handle terminating the current title
+    // Note: Don't resume here since we're about to terminate anyway
     auto abs_path = std::filesystem::absolute(path);
     auto result = emulator_->LaunchPath(abs_path);
     if (XFAILED(result)) {
       XELOGE("Failed to launch folder: {:08X}", result);
     }
+  } else if (was_title_open) {
+    // User cancelled - resume the emulation
+    XELOGI("FileOpenFolder: User cancelled, resuming emulation...");
+    emulator_->Resume();
   }
 }
 
 void EmulatorWindow::FileClose() {
-  if (emulator_->is_title_open()) {
-    emulator_->TerminateTitle();
+  if (!emulator_->is_title_open()) {
+    XELOGI("FileClose: No game is currently running");
+    return;
   }
+
+  XELOGI("FileClose: Closing current game...");
+
+  // First pause to stop all threads safely
+  emulator_->Pause();
+
+  // Small delay to ensure threads are fully paused
+  xe::threading::Sleep(std::chrono::milliseconds(100));
+
+  // Now terminate the title
+  emulator_->TerminateTitle();
+
+  // Update window title to show no game loaded
+  UpdateTitle();
+
+  XELOGI("FileClose: Game closed successfully, ready for new game");
 }
 
 void EmulatorWindow::ShowContentDirectory() {
@@ -954,8 +994,8 @@ void EmulatorWindow::CpuTimeScalarSetDouble() {
 
 void EmulatorWindow::CpuBreakIntoDebugger() {
   if (!cvars::debug) {
-    xe::ui::ImGuiDialog::ShowMessageBox(imgui_drawer_.get(), "Xenia Debugger",
-                                        "Xenia must be launched with the "
+    xe::ui::ImGuiDialog::ShowMessageBox(imgui_drawer_.get(), "Xenia-XT Debugger",
+                                        "Xenia-XT must be launched with the "
                                         "--debug flag in order to enable "
                                         "debugging.");
     return;

@@ -1457,6 +1457,7 @@ ID3D12Resource* D3D12TextureCache::RequestSwapTexture(
     return nullptr;
   }
   texture->MarkAsUsed();
+
   // The swap texture is likely to be used only for the presentation compute
   // shader, and not during emulation, where it'd be NON_PIXEL_SHADER_RESOURCE |
   // PIXEL_SHADER_RESOURCE.
