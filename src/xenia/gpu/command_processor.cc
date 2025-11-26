@@ -206,6 +206,12 @@ void CommandProcessor::WorkerThreadMain() {
   }
 
   while (worker_running_) {
+    // Check for termination request from kernel
+    if (kernel_state_ && kernel_state_->IsTerminating()) {
+      XELOGI("CommandProcessor: Termination requested, exiting worker thread");
+      break;
+    }
+
     while (!pending_fns_.empty()) {
       auto fn = std::move(pending_fns_.front());
       pending_fns_.pop();

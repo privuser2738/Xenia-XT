@@ -290,17 +290,11 @@ X_STATUS Emulator::TerminateTitle() {
 
   XELOGI("TerminateTitle: Beginning title termination");
 
-  // Only terminate if kernel state is fully initialized
-  // If kernel_state_ is null, the title is still loading and can't be safely terminated
+  // Terminate kernel state - this uses two-phase termination:
+  // 1. Sets termination flag for threads to check
+  // 2. Force terminates after brief grace period
   if (kernel_state_) {
     kernel_state_->TerminateTitle();
-
-    // Important: Wait for all pending async operations to complete or timeout
-    // This prevents delayed callbacks from executing after the title is terminated
-    XELOGI("TerminateTitle: Waiting for async operations to complete...");
-    xe::threading::Sleep(std::chrono::milliseconds(500));
-  } else {
-    XELOGW("TerminateTitle called but kernel_state_ not initialized - skipping thread termination");
   }
 
   title_id_ = std::nullopt;
@@ -313,48 +307,10 @@ X_STATUS Emulator::TerminateTitle() {
 }
 
 X_STATUS Emulator::CloseTitle() {
-  if (!is_title_open()) {
-    XELOGI("CloseTitle: No game is currently running");
-    return X_STATUS_UNSUCCESSFUL;
-  }
-
-  XELOGI("CloseTitle: Beginning full title cleanup...");
-
-  // First terminate all running threads and unload modules
-  TerminateTitle();
-
-  // Wait for thread termination to complete (threads have 2s timeout each)
-  // Give extra time to ensure all cleanup is finished
-  XELOGI("CloseTitle: Waiting for thread termination and async cleanup...");
-  xe::threading::Sleep(std::chrono::seconds(3));
-
-  // Unregister game devices and symlinks
-  XELOGI("CloseTitle: Unregistering game devices...");
-  file_system_->UnregisterSymbolicLink("game:");
-  file_system_->UnregisterSymbolicLink("d:");
-  file_system_->UnregisterDevice("\\Device\\Cdrom0");
-  file_system_->UnregisterDevice("\\Device\\Harddisk0\\Partition1");
-
-  // Clear GPU caches to remove any game-specific shader/texture data
-  XELOGI("CloseTitle: Clearing GPU caches...");
-  if (graphics_system_) {
-    graphics_system_->ClearCaches();
-  }
-
-  // Forcefully destroy the kernel state to ensure all resources are freed
-  // This includes any pending timers, async operations, or COM callbacks
-  XELOGI("CloseTitle: Destroying kernel state to free all resources...");
-  kernel_state_.reset();
-
-  // Additional sleep to allow OS-level cleanup (COM, timers, etc.)
-  xe::threading::Sleep(std::chrono::milliseconds(500));
-
-  // Recreate kernel state for clean slate - required for launching new games
-  kernel_state_ = std::make_unique<xe::kernel::KernelState>(this);
-  XELOGI("CloseTitle: Kernel state recreated with fresh state");
-
-  XELOGI("CloseTitle: Title closed successfully, ready for new game");
-  return X_STATUS_SUCCESS;
+  // CloseTitle is now just an alias for TerminateTitle
+  // Full cleanup (kernel state reset, device unregistration) happens
+  // automatically when LaunchPath is called for a new game
+  return TerminateTitle();
 }
 
 X_STATUS Emulator::LaunchPath(const std::filesystem::path& path) {

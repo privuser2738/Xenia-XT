@@ -157,6 +157,15 @@ class KernelState {
   // This DOES NOT RETURN if called from a guest thread!
   void TerminateTitle();
 
+  // Check if termination is in progress - threads should check this and exit
+  bool IsTerminating() const { return terminating_.load(std::memory_order_relaxed); }
+
+  // Request termination - sets flag for threads to check
+  void RequestTermination() { terminating_.store(true, std::memory_order_release); }
+
+  // Clear termination flag (for reuse after cleanup)
+  void ClearTermination() { terminating_.store(false, std::memory_order_release); }
+
   void RegisterThread(XThread* thread);
   void UnregisterThread(XThread* thread);
   void OnThreadExecute(XThread* thread);
@@ -228,6 +237,7 @@ class KernelState {
   uint32_t process_info_block_address_ = 0;
 
   std::atomic<bool> dispatch_thread_running_;
+  std::atomic<bool> terminating_{false};  // Global termination flag
   object_ref<XHostThread> dispatch_thread_;
   // Must be guarded by the global critical region.
   util::NativeList dpc_list_;

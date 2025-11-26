@@ -9,14 +9,13 @@
 
 #include "xenia/kernel/kernel_state.h"
 
-#include <chrono>
-#include <future>
 #include <string>
 
 #include "third_party/fmt/include/fmt/format.h"
 #include "xenia/base/assert.h"
 #include "xenia/base/byte_stream.h"
 #include "xenia/base/logging.h"
+#include "xenia/base/threading.h"
 #include "xenia/base/string.h"
 #include "xenia/cpu/processor.h"
 #include "xenia/emulator.h"
@@ -489,88 +488,65 @@ void KernelState::UnloadUserModule(const object_ref<UserModule>& module,
 }
 
 void KernelState::TerminateTitle() {
-  XELOGD("KernelState::TerminateTitle");
-  auto global_lock = global_critical_region_.Acquire();
+  XELOGD("KernelState::TerminateTitle - Beginning two-phase termination");
 
-  // Call terminate routines.
-  // TODO(benvanik): these might take arguments.
-  // FIXME: Calling these will send some threads into kernel code and they'll
-  // hold the lock when terminated! Do we need to wait for all threads to exit?
-  /*
-  if (from_guest_thread) {
-    for (auto routine : terminate_notifications_) {
-      auto thread_state = XThread::GetCurrentThread()->thread_state();
-      processor()->Execute(thread_state, routine.guest_routine);
-    }
+  // Phase 1: Signal all threads to terminate gracefully
+  // Set the termination flag - threads checking IsTerminating() will exit
+  RequestTermination();
+  XELOGI("TerminateTitle: Phase 1 - Termination flag set, waiting for threads...");
+
+  // Give threads a brief moment to notice the flag and exit gracefully
+  // This is much shorter than before because we're just signaling, not blocking
+  xe::threading::Sleep(std::chrono::milliseconds(50));
+
+  // Phase 2: Force terminate any remaining threads
+  XELOGI("TerminateTitle: Phase 2 - Force terminating remaining threads...");
+
+  // Try to acquire lock with very short timeout - if we can't get it, proceed anyway
+  auto global_lock = global_critical_region_.TryAcquire();
+  if (!global_lock.owns_lock()) {
+    // Try once more after a brief wait
+    xe::threading::Sleep(std::chrono::milliseconds(10));
+    global_lock = global_critical_region_.TryAcquire();
   }
-  terminate_notifications_.clear();
-  */
 
-  // Kill all guest threads.
+  if (!global_lock.owns_lock()) {
+    XELOGW("TerminateTitle: Could not acquire lock, proceeding with force termination");
+  }
+
+  // Kill all guest threads - don't try to step to safe point, just terminate
   for (auto it = threads_by_id_.begin(); it != threads_by_id_.end();) {
-    if (!XThread::IsInThread(it->second) && it->second->is_guest_thread()) {
+    if (it->second && !XThread::IsInThread(it->second) && it->second->is_guest_thread()) {
       auto thread = it->second;
-
       if (thread->is_running()) {
-        // Need to step the thread to a safe point (returns it to guest code
-        // so it's guaranteed to not be holding any locks / in host kernel
-        // code / etc). Can't do that properly if we have the lock.
-        if (!emulator_->is_paused()) {
-          thread->thread()->Suspend();
-        }
-
-        global_lock.unlock();
-        // Try to step to safe point with a timeout to prevent hanging
-        // Use a future with timeout to avoid infinite waits
-        auto step_future = std::async(std::launch::async, [this, thread]() {
-          try {
-            processor_->StepToGuestSafePoint(thread->thread_id());
-            return true;
-          } catch (...) {
-            return false;
-          }
-        });
-
-        // Wait up to 2 seconds for thread to reach safe point
-        if (step_future.wait_for(std::chrono::seconds(2)) == std::future_status::timeout) {
-          XELOGW("Thread {} failed to reach safe point after 2s timeout, forcing termination",
-                 thread->thread_id());
-        }
-
+        XELOGD("TerminateTitle: Force terminating thread {}", thread->thread_id());
         thread->Terminate(0);
-        global_lock.lock();
       }
-
-      // Erase it from the thread list.
       it = threads_by_id_.erase(it);
     } else {
       ++it;
     }
   }
 
-  // Third: Unload all user modules (including the executable).
+  // Unload all user modules
   for (size_t i = 0; i < user_modules_.size(); i++) {
-    X_STATUS status = user_modules_[i]->Unload();
-    if (!XSUCCEEDED(status)) {
-      XELOGW("Failed to unload module {}: status 0x{:08X}",
-             user_modules_[i]->name(), status);
+    if (user_modules_[i]) {
+      X_STATUS status = user_modules_[i]->Unload();
+      if (!XSUCCEEDED(status)) {
+        XELOGW("Failed to unload module {}: status 0x{:08X}",
+               user_modules_[i]->name(), status);
+      }
+      object_table_.ReleaseHandle(user_modules_[i]->handle());
     }
-
-    // Use ReleaseHandle instead of RemoveHandle to properly handle ref count
-    object_table_.ReleaseHandle(user_modules_[i]->handle());
   }
   user_modules_.clear();
 
-  // Release all objects in the object table.
+  // Release all objects in the object table
   object_table_.PurgeAllObjects();
 
-  // Unregister all notify listeners.
+  // Clear other state
   notify_listeners_.clear();
-
-  // Clear the TLS map.
   tls_bitmap_.Reset();
-
-  // Unset the executable module.
   executable_module_ = nullptr;
 
   if (process_info_block_address_) {
@@ -578,12 +554,17 @@ void KernelState::TerminateTitle() {
     process_info_block_address_ = 0;
   }
 
+  // Clear termination flag for next game load
+  ClearTermination();
+
+  XELOGI("TerminateTitle: Termination complete");
+
+  // If called from guest thread, terminate self
   if (XThread::IsInThread()) {
     threads_by_id_.erase(XThread::GetCurrentThread()->thread_id());
-
-    // Now commit suicide (using Terminate, because we can't call into guest
-    // code anymore).
-    global_lock.unlock();
+    if (global_lock.owns_lock()) {
+      global_lock.unlock();
+    }
     XThread::GetCurrentThread()->Terminate(0);
   }
 }

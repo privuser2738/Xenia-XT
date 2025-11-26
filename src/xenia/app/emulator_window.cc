@@ -936,16 +936,14 @@ void EmulatorWindow::FileClose() {
 
   XELOGI("FileClose: Closing current game...");
 
-  // Pause emulation first
-  emulator_->Pause();
+  // Use the new two-phase termination system
+  // This signals threads to stop, waits briefly, then force terminates
+  emulator_->TerminateTitle();
 
-  // Perform full cleanup including device unregistration and GPU cache clear
-  emulator_->CloseTitle();
-
-  // Update window title to show no game loaded
+  // Update window title to reflect no game loaded
   UpdateTitle();
 
-  XELOGI("FileClose: Game closed successfully, ready for new game");
+  XELOGI("FileClose: Game closed");
 }
 
 void EmulatorWindow::ShowContentDirectory() {
