@@ -44,6 +44,12 @@ legally purchased devices and games and information made public on the internet.
 2. Run `xenia-xt.exe`
 3. Use File → Open to load an Xbox 360 game (ISO, XEX, or extracted folder)
 
+### Linux
+
+1. Build from source (see Building section below)
+2. Run `./build/bin/Linux/Release/xenia` or install with `./install.sh`
+3. Use File → Open to load an Xbox 360 game (ISO, XEX, or extracted folder)
+
 ### Controls
 
 - **Ctrl+O** - Open game file
@@ -53,14 +59,16 @@ legally purchased devices and games and information made public on the internet.
 
 ## Building
 
-### Requirements (Windows)
+### Windows
+
+#### Requirements
 
 - Windows 10/11 (64-bit)
 - [Visual Studio 2022 or 2019](https://www.visualstudio.com/downloads/)
 - [Python 3.6+](https://www.python.org/downloads/) (ensure it's in PATH)
 - Windows SDK (10.0.22000.0 or newer)
 
-### Quick Build
+#### Quick Build
 
 ```batch
 # Clone the repository
@@ -76,7 +84,7 @@ build-windows.bat dist              # Build and create distribution package
 build-windows.bat help              # Show all options
 ```
 
-### Build Commands
+#### Build Commands
 
 | Command | Description |
 |---------|-------------|
@@ -87,7 +95,7 @@ build-windows.bat help              # Show all options
 | `build-windows.bat dist` | Build and create distribution in `dist/` folder |
 | `build-windows.bat help` | Show help message |
 
-### Advanced Build (using xb.cmd)
+#### Advanced Build (using xb.cmd)
 
 For more advanced build options, use the `xb.cmd` script directly:
 
@@ -98,6 +106,95 @@ xb.cmd build --config Release  # Build release
 xb.cmd premake            # Regenerate project files
 xb.cmd devenv             # Open in Visual Studio
 xb.cmd format             # Format code
+```
+
+### Linux
+
+#### Requirements
+
+- 64-bit Linux distribution
+- LLVM/Clang 9+ or GCC 9+
+- [Python 3.6+](https://www.python.org/downloads/)
+- Build tools: make or ninja
+- Development libraries (install before building):
+
+**Debian/Ubuntu:**
+```bash
+sudo apt-get install build-essential clang llvm ninja-build python3 \
+    libgtk-3-dev libpthread-stubs0-dev liblz4-dev libx11-dev \
+    libx11-xcb-dev libvulkan-dev libsdl2-dev libiberty-dev \
+    libunwind-dev libc++-dev libc++abi-dev
+```
+
+**Arch/Manjaro:**
+```bash
+sudo pacman -S base-devel clang llvm ninja python gtk3 libx11 \
+    vulkan-headers vulkan-icd-loader sdl2 libunwind
+```
+
+**Fedora:**
+```bash
+sudo dnf install gcc-c++ clang llvm ninja-build python3 \
+    gtk3-devel libX11-devel vulkan-headers vulkan-loader-devel \
+    SDL2-devel libunwind-devel
+```
+
+#### Quick Build
+
+```bash
+# Clone the repository
+git clone --recursive https://github.com/YourUsername/xenia-xt.git
+cd xenia-xt
+
+# First-time setup
+./build-linux.sh setup
+
+# Build (creates xenia in build/bin/Linux/Release/)
+./build-linux.sh
+
+# Or build with options
+./build-linux.sh --config=Debug
+./build-linux.sh dist              # Build and create distribution package
+./build-linux.sh help              # Show all options
+```
+
+#### Build Commands
+
+| Command | Description |
+|---------|-------------|
+| `./build-linux.sh` | Build Release configuration |
+| `./build-linux.sh --config=Debug` | Build Debug configuration |
+| `./build-linux.sh setup` | Setup submodules and run premake |
+| `./build-linux.sh clean` | Clean build outputs |
+| `./build-linux.sh dist` | Build and create distribution tarball |
+| `./build-linux.sh help` | Show help message |
+
+#### Installation
+
+After building, you can install Xenia system-wide or for the current user:
+
+```bash
+# Install for current user (no sudo required)
+./install.sh
+
+# Install system-wide (requires sudo)
+sudo ./install.sh system
+
+# Uninstall
+./uninstall.sh        # User install
+sudo ./uninstall.sh   # System install
+```
+
+#### Advanced Build (using xenia-build)
+
+For more advanced build options, use the `xenia-build` script directly:
+
+```bash
+./xenia-build setup              # Initial setup
+./xenia-build build              # Build debug
+./xenia-build build --config release  # Build release
+./xenia-build premake            # Regenerate project files
+./xenia-build clean              # Clean outputs
 ```
 
 See [docs/building.md](docs/building.md) for detailed build instructions.

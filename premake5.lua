@@ -97,6 +97,9 @@ filter("platforms:Linux")
   toolset("clang")
   buildoptions({
     -- "-mlzcnt",  -- (don't) Assume lzcnt is supported.
+    "-Wno-deprecated-literal-operator",  -- Disable deprecated literal operator warning for fmt library compatibility
+    "-Wno-integer-overflow",  -- Disable integer overflow warning for cxxopts library compatibility
+    "-Wno-nontrivial-memcall",  -- Disable nontrivial-memcall warning for imgui library compatibility
   })
   pkg_config.all("gtk+-x11-3.0")
   links({

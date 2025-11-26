@@ -13,13 +13,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${SCRIPT_DIR}/build/bin/Linux"
 
 # Detect build type (prefer Release, fall back to Debug)
-if [ -d "${BUILD_DIR}/Release" ] && [ -f "${BUILD_DIR}/Release/xenia" ]; then
+if [ -d "${BUILD_DIR}/Release" ] && [ -f "${BUILD_DIR}/Release/xenia-xt" ]; then
     BUILD_TYPE="Release"
-elif [ -d "${BUILD_DIR}/Debug" ] && [ -f "${BUILD_DIR}/Debug/xenia" ]; then
+elif [ -d "${BUILD_DIR}/Debug" ] && [ -f "${BUILD_DIR}/Debug/xenia-xt" ]; then
     BUILD_TYPE="Debug"
 else
-    echo "Error: No xenia binary found. Please build first with:"
-    echo "  ./xenia-build build"
+    echo "Error: No xenia-xt binary found. Please build first with:"
+    echo "  ./build-linux.sh"
     exit 1
 fi
 
@@ -50,8 +50,10 @@ mkdir -p "${ICON_DIR}/256x256/apps"
 mkdir -p "${ICON_DIR}/512x512/apps"
 
 # Install main binary
-echo "Installing xenia binary..."
-install -m 755 "${BIN_DIR}/xenia" "${PREFIX}/bin/xenia"
+echo "Installing xenia-xt binary..."
+install -m 755 "${BIN_DIR}/xenia-xt" "${PREFIX}/bin/xenia-xt"
+# Create symlink for 'xenia' command for convenience
+ln -sf "${PREFIX}/bin/xenia-xt" "${PREFIX}/bin/xenia"
 
 # Install optional tools
 OPTIONAL_TOOLS=(
@@ -83,15 +85,15 @@ echo "Creating desktop entry..."
 cat > "${DESKTOP_DIR}/xenia.desktop" << EOF
 [Desktop Entry]
 Type=Application
-Name=Xenia
+Name=Xenia-XT
 GenericName=Xbox 360 Emulator
-Comment=Xbox 360 video game console emulator
-Exec=${PREFIX}/bin/xenia %f
+Comment=Xbox 360 video game console emulator (Xenia-XT fork)
+Exec=${PREFIX}/bin/xenia-xt %f
 Icon=xenia
 Terminal=false
 Categories=Game;Emulator;
 MimeType=application/x-iso9660-image;application/x-xbox360-xex;
-Keywords=xbox;360;emulator;game;
+Keywords=xbox;360;emulator;game;xenia;
 EOF
 
 # Update icon cache if available
@@ -110,7 +112,8 @@ echo ""
 echo "Installation complete!"
 echo ""
 echo "Installed:"
-echo "  - xenia binary: ${PREFIX}/bin/xenia"
+echo "  - xenia-xt binary: ${PREFIX}/bin/xenia-xt"
+echo "  - xenia symlink: ${PREFIX}/bin/xenia -> xenia-xt"
 echo "  - Desktop entry: ${DESKTOP_DIR}/xenia.desktop"
 echo "  - Icons: ${ICON_DIR}/*/apps/xenia.png"
 echo ""
@@ -125,4 +128,4 @@ if [ "$1" != "system" ]; then
     fi
 fi
 
-echo "Run 'xenia' to start the emulator, or find it in your application menu."
+echo "Run 'xenia-xt' (or 'xenia') to start the emulator, or find it in your application menu."
