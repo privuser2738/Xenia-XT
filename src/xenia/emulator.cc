@@ -284,25 +284,34 @@ X_STATUS Emulator::Setup(
 }
 
 X_STATUS Emulator::TerminateTitle() {
+  XELOGI("=== Emulator::TerminateTitle START ===");
+
   if (!is_title_open()) {
+    XELOGI("TerminateTitle: No title open, returning");
     return X_STATUS_UNSUCCESSFUL;
   }
 
-  XELOGI("TerminateTitle: Beginning title termination");
+  XELOGI("TerminateTitle: Title ID was: 0x{:08X}", title_id_.value_or(0));
 
-  // Terminate kernel state - this uses two-phase termination:
-  // 1. Sets termination flag for threads to check
-  // 2. Force terminates after brief grace period
   if (kernel_state_) {
+    XELOGI("TerminateTitle: Calling kernel_state_->TerminateTitle()...");
     kernel_state_->TerminateTitle();
+    XELOGI("TerminateTitle: kernel_state_->TerminateTitle() returned");
+  } else {
+    XELOGW("TerminateTitle: kernel_state_ is null!");
   }
 
+  XELOGI("TerminateTitle: Clearing title info...");
   title_id_ = std::nullopt;
   title_name_ = "";
   title_version_ = "";
+  XELOGI("TerminateTitle: Title info cleared");
 
-  XELOGI("TerminateTitle: Title terminated successfully");
+  XELOGI("TerminateTitle: Calling on_terminate()...");
   on_terminate();
+  XELOGI("TerminateTitle: on_terminate() returned");
+
+  XELOGI("=== Emulator::TerminateTitle COMPLETE ===");
   return X_STATUS_SUCCESS;
 }
 

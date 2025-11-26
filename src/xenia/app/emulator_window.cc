@@ -929,21 +929,22 @@ void EmulatorWindow::FileOpenFolder() {
 }
 
 void EmulatorWindow::FileClose() {
+  XELOGI("=== EmulatorWindow::FileClose START ===");
+
   if (!emulator_->is_title_open()) {
     XELOGI("FileClose: No game is currently running");
     return;
   }
 
-  XELOGI("FileClose: Closing current game...");
+  XELOGI("FileClose: Game is open, calling TerminateTitle...");
 
   // Use the new two-phase termination system
-  // This signals threads to stop, waits briefly, then force terminates
   emulator_->TerminateTitle();
 
-  // Update window title to reflect no game loaded
+  XELOGI("FileClose: TerminateTitle returned, updating window title...");
   UpdateTitle();
 
-  XELOGI("FileClose: Game closed");
+  XELOGI("=== EmulatorWindow::FileClose COMPLETE ===");
 }
 
 void EmulatorWindow::ShowContentDirectory() {

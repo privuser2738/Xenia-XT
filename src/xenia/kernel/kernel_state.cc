@@ -488,79 +488,94 @@ void KernelState::UnloadUserModule(const object_ref<UserModule>& module,
 }
 
 void KernelState::TerminateTitle() {
-  XELOGD("KernelState::TerminateTitle - Beginning two-phase termination");
+  XELOGI("=== KernelState::TerminateTitle START ===");
 
   // Phase 1: Signal all threads to terminate gracefully
-  // Set the termination flag - threads checking IsTerminating() will exit
+  XELOGI("TerminateTitle: [1/8] Setting termination flag...");
   RequestTermination();
-  XELOGI("TerminateTitle: Phase 1 - Termination flag set, waiting for threads...");
+  XELOGI("TerminateTitle: [1/8] Termination flag SET");
 
-  // Give threads a brief moment to notice the flag and exit gracefully
-  // This is much shorter than before because we're just signaling, not blocking
+  XELOGI("TerminateTitle: [2/8] Waiting 50ms for graceful thread exit...");
   xe::threading::Sleep(std::chrono::milliseconds(50));
+  XELOGI("TerminateTitle: [2/8] Wait complete");
 
   // Phase 2: Force terminate any remaining threads
-  XELOGI("TerminateTitle: Phase 2 - Force terminating remaining threads...");
-
-  // Try to acquire lock with very short timeout - if we can't get it, proceed anyway
+  XELOGI("TerminateTitle: [3/8] Attempting to acquire global lock...");
   auto global_lock = global_critical_region_.TryAcquire();
   if (!global_lock.owns_lock()) {
-    // Try once more after a brief wait
+    XELOGI("TerminateTitle: [3/8] Lock not acquired, retrying...");
     xe::threading::Sleep(std::chrono::milliseconds(10));
     global_lock = global_critical_region_.TryAcquire();
   }
+  XELOGI("TerminateTitle: [3/8] Lock status: {}", global_lock.owns_lock() ? "ACQUIRED" : "NOT ACQUIRED");
 
-  if (!global_lock.owns_lock()) {
-    XELOGW("TerminateTitle: Could not acquire lock, proceeding with force termination");
-  }
-
-  // Kill all guest threads - don't try to step to safe point, just terminate
+  // Kill all guest threads
+  XELOGI("TerminateTitle: [4/8] Terminating guest threads (count: {})...", threads_by_id_.size());
+  int terminated_count = 0;
   for (auto it = threads_by_id_.begin(); it != threads_by_id_.end();) {
     if (it->second && !XThread::IsInThread(it->second) && it->second->is_guest_thread()) {
       auto thread = it->second;
+      XELOGI("TerminateTitle: [4/8]   Thread {} running={}", thread->thread_id(), thread->is_running());
       if (thread->is_running()) {
-        XELOGD("TerminateTitle: Force terminating thread {}", thread->thread_id());
+        XELOGI("TerminateTitle: [4/8]   Calling Terminate on thread {}...", thread->thread_id());
         thread->Terminate(0);
+        XELOGI("TerminateTitle: [4/8]   Thread {} terminated", thread->thread_id());
+        terminated_count++;
       }
       it = threads_by_id_.erase(it);
     } else {
       ++it;
     }
   }
+  XELOGI("TerminateTitle: [4/8] Terminated {} threads", terminated_count);
 
   // Unload all user modules
+  XELOGI("TerminateTitle: [5/8] Unloading user modules (count: {})...", user_modules_.size());
   for (size_t i = 0; i < user_modules_.size(); i++) {
     if (user_modules_[i]) {
+      XELOGI("TerminateTitle: [5/8]   Unloading module: {}", user_modules_[i]->name());
       X_STATUS status = user_modules_[i]->Unload();
       if (!XSUCCEEDED(status)) {
-        XELOGW("Failed to unload module {}: status 0x{:08X}",
-               user_modules_[i]->name(), status);
+        XELOGW("TerminateTitle: [5/8]   Failed to unload module {}: 0x{:08X}", user_modules_[i]->name(), status);
       }
+      XELOGI("TerminateTitle: [5/8]   Releasing handle for module: {}", user_modules_[i]->name());
       object_table_.ReleaseHandle(user_modules_[i]->handle());
     }
   }
   user_modules_.clear();
+  XELOGI("TerminateTitle: [5/8] User modules cleared");
 
   // Release all objects in the object table
+  XELOGI("TerminateTitle: [6/8] Purging object table...");
   object_table_.PurgeAllObjects();
+  XELOGI("TerminateTitle: [6/8] Object table purged");
 
   // Clear other state
+  XELOGI("TerminateTitle: [7/8] Clearing other state...");
   notify_listeners_.clear();
+  XELOGI("TerminateTitle: [7/8]   notify_listeners_ cleared");
   tls_bitmap_.Reset();
+  XELOGI("TerminateTitle: [7/8]   tls_bitmap_ reset");
   executable_module_ = nullptr;
+  XELOGI("TerminateTitle: [7/8]   executable_module_ cleared");
 
   if (process_info_block_address_) {
+    XELOGI("TerminateTitle: [7/8]   Freeing process_info_block at 0x{:08X}", process_info_block_address_);
     memory_->SystemHeapFree(process_info_block_address_);
     process_info_block_address_ = 0;
   }
+  XELOGI("TerminateTitle: [7/8] State cleared");
 
   // Clear termination flag for next game load
+  XELOGI("TerminateTitle: [8/8] Clearing termination flag...");
   ClearTermination();
+  XELOGI("TerminateTitle: [8/8] Termination flag cleared");
 
-  XELOGI("TerminateTitle: Termination complete");
+  XELOGI("=== KernelState::TerminateTitle COMPLETE ===");
 
   // If called from guest thread, terminate self
   if (XThread::IsInThread()) {
+    XELOGI("TerminateTitle: Called from guest thread, terminating self...");
     threads_by_id_.erase(XThread::GetCurrentThread()->thread_id());
     if (global_lock.owns_lock()) {
       global_lock.unlock();

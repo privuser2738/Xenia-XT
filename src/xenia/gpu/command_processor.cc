@@ -206,10 +206,19 @@ void CommandProcessor::WorkerThreadMain() {
   }
 
   while (worker_running_) {
-    // Check for termination request from kernel
+    // Check for termination request from kernel - if terminating,
+    // wait for it to complete but don't exit the thread
     if (kernel_state_ && kernel_state_->IsTerminating()) {
-      XELOGI("CommandProcessor: Termination requested, exiting worker thread");
-      break;
+      XELOGI("CommandProcessor: Termination in progress, waiting...");
+      // Process any pending functions (like shader init) even during termination
+      while (!pending_fns_.empty()) {
+        auto fn = std::move(pending_fns_.front());
+        pending_fns_.pop();
+        fn();
+      }
+      // Brief sleep to avoid spinning, then check again
+      xe::threading::Sleep(std::chrono::milliseconds(10));
+      continue;
     }
 
     while (!pending_fns_.empty()) {

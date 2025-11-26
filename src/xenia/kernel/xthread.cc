@@ -461,25 +461,42 @@ X_STATUS XThread::Exit(int exit_code) {
 }
 
 X_STATUS XThread::Terminate(int exit_code) {
-  // TODO(benvanik): inform the profiler that this thread is exiting.
+  XELOGI("XThread::Terminate: thread_id={} exit_code={}", thread_id_, exit_code);
 
   // Set exit code.
   X_KTHREAD* thread = guest_object<X_KTHREAD>();
-  thread->header.signal_state = 1;
-  thread->exit_status = exit_code;
+  if (thread) {
+    thread->header.signal_state = 1;
+    thread->exit_status = exit_code;
+    XELOGI("XThread::Terminate: Set thread guest object state");
+  } else {
+    XELOGW("XThread::Terminate: guest_object is null!");
+  }
 
   // Notify processor of our exit.
+  XELOGI("XThread::Terminate: Notifying processor...");
   emulator()->processor()->OnThreadExit(thread_id_);
+  XELOGI("XThread::Terminate: Processor notified");
 
   running_ = false;
+
   if (XThread::IsInThread(this)) {
+    XELOGI("XThread::Terminate: IsInThread=true, calling Thread::Exit");
     ReleaseHandle();
     xe::threading::Thread::Exit(exit_code);
   } else {
-    thread_->Terminate(exit_code);
+    XELOGI("XThread::Terminate: IsInThread=false, calling thread_->Terminate");
+    if (thread_) {
+      thread_->Terminate(exit_code);
+      XELOGI("XThread::Terminate: thread_->Terminate returned");
+    } else {
+      XELOGW("XThread::Terminate: thread_ is null!");
+    }
     ReleaseHandle();
+    XELOGI("XThread::Terminate: Handle released");
   }
 
+  XELOGI("XThread::Terminate: Complete for thread_id={}", thread_id_);
   return X_STATUS_SUCCESS;
 }
 
